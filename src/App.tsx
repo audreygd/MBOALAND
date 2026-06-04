@@ -1,19 +1,30 @@
 import "./App.css";
-import Header from "./components/Header";
-import Sidebar from "./components/Sidebar";
-import SellerDashboard from "./page/SellerDashboard";
-import { Box } from "@mui/material";
+import { apps } from "./appData";
 
-function App() {
+export default function App() {
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh", position: "sticky" }}>
-      <Sidebar />
-      <Box sx={{ flex: 1 }}>
-        <Header />
-        <SellerDashboard />
-      </Box>
-    </Box>
+    <div className="selector-shell">
+      <header className="selector-hero">
+        <span className="eyebrow">MBOALAND</span>
+        <h1>Choose your application</h1>
+        <p className="lead">
+          Open the role-based portal you want to work in. Every card loads the
+          corresponding app and shows the current status.
+        </p>
+      </header>
+
+      <div className="app-grid">
+        {apps.map((app) => (
+          <a className="app-card" key={app.id} href={app.href}>
+            <div>
+              <span className="status-pill">{app.status}</span>
+              <h2>{app.name}</h2>
+              <p>{app.description}</p>
+            </div>
+            <span className="app-action">Open {app.name}</span>
+          </a>
+        ))}
+      </div>
+    </div>
   );
 }
-
-export default App;

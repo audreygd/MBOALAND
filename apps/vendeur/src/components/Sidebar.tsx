@@ -133,6 +133,8 @@ export default function Sidebar() {
       <Divider />
       <Box sx={{ p: 4 }}>
         <Button
+          component="a"
+          href="/"
           fullWidth
           variant="outlined"
           sx={{
