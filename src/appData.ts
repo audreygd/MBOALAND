@@ -5,7 +5,6 @@ export const apps = [
     href: "/apps/vendeur/index.html",
     description:
       "Manage listings, offers, transactions, and sales from the seller dashboard.",
-    status: "Live",
   },
   {
     id: "acheteur",
@@ -13,7 +12,6 @@ export const apps = [
     href: "/apps/acheteur/index.html",
     description:
       "Browse properties, make offers, and track purchases in the buyer portal.",
-    status: "Live",
   },
   {
     id: "notaire",
@@ -21,7 +19,6 @@ export const apps = [
     href: "/apps/notaire/index.html",
     description:
       "Access contract validation, signatures, and closing workflows.",
-    status: "Live",
   },
   {
     id: "geometre",
@@ -29,7 +26,6 @@ export const apps = [
     href: "/apps/geometre/index.html",
     description:
       "Open the surveyor tools for land measurements and map validation.",
-    status: "Live",
   },
   {
     id: "admin",
@@ -37,6 +33,5 @@ export const apps = [
     href: "/apps/admin/index.html",
     description:
       "Manage users, permissions, and system settings from the admin portal.",
-    status: "Live",
   },
 ];

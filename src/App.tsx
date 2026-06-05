@@ -5,11 +5,10 @@ export default function App() {
   return (
     <div className="selector-shell">
       <header className="selector-hero">
-        <span className="eyebrow">MBOALAND</span>
-        <h1>Choose your application</h1>
+        <img src="favicon.png" alt="logo" height={"100px"} />
+        <h1>Choisissez votre application</h1>
         <p className="lead">
-          Open the role-based portal you want to work in. Every card loads the
-          corresponding app and shows the current status.
+          Ouvrez une application et commencez à travailler.
         </p>
       </header>
 
@@ -17,11 +16,8 @@ export default function App() {
         {apps.map((app) => (
           <a className="app-card" key={app.id} href={app.href}>
             <div>
-              <span className="status-pill">{app.status}</span>
               <h2>{app.name}</h2>
-              <p>{app.description}</p>
             </div>
-            <span className="app-action">Open {app.name}</span>
           </a>
         ))}
       </div>

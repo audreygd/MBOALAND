@@ -47,7 +47,7 @@ h1 {
 
 .app-card {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: space-between;
   min-height: 190px;
   padding: 1.75rem;
