@@ -8,6 +8,8 @@ import {
   TableBody,
   Chip,
   Button,
+  Box,
+  Link,
 } from "@mui/material";
 
 const lands = [
@@ -31,7 +33,11 @@ const lands = [
   },
 ];
 
-export default function LandTable() {
+interface LandTableProps {
+  showAll?: boolean;
+}
+
+export default function LandTable({ showAll }: LandTableProps) {
   return (
     <Paper
       elevation={1}
@@ -40,9 +46,41 @@ export default function LandTable() {
         borderRadius: 1,
       }}
     >
-      <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-        Mes terrains
-      </Typography>
+      <Box
+        sx={{
+          justifyContent: "space-between",
+          flexDirection: "row",
+          display: "flex",
+          pb: 2,
+        }}
+      >
+        <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+          Mes terrains
+        </Typography>
+        {showAll && (
+          <Link
+            href="#terrains"
+            onClick={(e) => {
+              e.preventDefault();
+              window.location.hash = "#terrains";
+            }}
+          >
+            <Button
+              variant="outlined"
+              sx={{
+                borderColor: "#15803d",
+                borderRadius: 1,
+                px: 3,
+                textTransform: "none",
+              }}
+            >
+              <Typography sx={{ fontWeight: 600, color: "#15803d" }}>
+                Voir tout
+              </Typography>
+            </Button>
+          </Link>
+        )}
+      </Box>
 
       <Table>
         <TableHead>
@@ -75,7 +113,11 @@ export default function LandTable() {
                 />
               </TableCell>
               <TableCell>
-                <Button variant="outlined" size="small">
+                <Button
+                  variant="outlined"
+                  size="small"
+                  sx={{ textTransform: "none" }}
+                >
                   Voir
                 </Button>{" "}
               </TableCell>

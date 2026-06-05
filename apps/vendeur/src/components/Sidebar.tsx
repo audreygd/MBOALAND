@@ -68,7 +68,15 @@ const menuItems = [
   },
 ];
 
-export default function Sidebar() {
+type SidebarProps = {
+  selectedItem: string;
+  onMenuItemClick: (menu: string) => void;
+};
+
+export default function Sidebar({
+  selectedItem,
+  onMenuItemClick,
+}: SidebarProps) {
   return (
     <Drawer
       variant="permanent"
@@ -111,19 +119,24 @@ export default function Sidebar() {
       </Toolbar>
 
       <List>
-        {menuItems.map((menu, index) => (
+        {menuItems.map((menu) => (
           <ListItemButton
             key={menu.title}
-            selected={index === 0}
-            sx={{ gap: 1, fontSize: 20, fontWeight: 600 }}
+            selected={menu.title === selectedItem}
+            onClick={() => onMenuItemClick(menu.title)}
+            sx={{
+              gap: 2,
+              fontSize: 24,
+              fontWeight: 600,
+              borderRadius: 0.5,
+              mx: 2,
+              my: 1,
+            }}
           >
             <ListItemIcon sx={{ minWidth: 36, color: "#15803d" }}>
               {menu.icon}
             </ListItemIcon>
-            <ListItemText
-              primary={menu.title}
-              sx={{ fontSize: 18, fontWeight: 600 }}
-            />
+            <ListItemText primary={menu.title} />
           </ListItemButton>
         ))}
       </List>
@@ -133,6 +146,8 @@ export default function Sidebar() {
       <Divider />
       <Box sx={{ p: 4 }}>
         <Button
+          component="a"
+          href="/"
           fullWidth
           variant="outlined"
           sx={{
