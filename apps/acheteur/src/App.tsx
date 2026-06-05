@@ -1,10 +1,10 @@
-import React from 'react';
-import AchatProcessus from './AchatProcessus';
+import "./App.css";
 
-function App() {
+export default function App() {
   return (
-    <AchatProcessus />
+    <main className="app-shell">
+      <h1>Acheteur App</h1>
+      <p>This is a placeholder for the acheteur role application.</p>
+    </main>
   );
 }
-
-export default App;
