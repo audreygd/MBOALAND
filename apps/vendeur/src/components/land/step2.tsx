@@ -1,4 +1,11 @@
-import { Box, Button, List, ListItem, ListItemText } from "@mui/material";
+import {
+  Box,
+  Button,
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
+} from "@mui/material";
 import type { Dispatch, SetStateAction } from "react";
 
 type FullData = {
@@ -27,6 +34,9 @@ export default function Step2({
 
   return (
     <Box sx={{ display: "grid", gap: 2 }}>
+      <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 3 }}>
+        Photos et Documents
+      </Typography>
       <Box>
         <Button
           sx={{ borderRadius: 0.5, textTransform: "none" }}

@@ -3,6 +3,7 @@ import { Box, Button, Typography } from "@mui/material";
 import Step1 from "./step1";
 import Step2 from "./step2";
 import Step3 from "./step3";
+import SuccessDialog from "./SuccesDialogCreation";
 
 type FullData = {
   name: string;
@@ -73,85 +74,89 @@ export default function AddLandForm({
     if (validateStep(step)) setStep((s) => Math.min(2, s + 1));
   };
   const prev = () => setStep((s) => Math.max(0, s - 1));
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+
+  const handleSubmit = () => {
+    setSubmitted(true);
+    setStep(0);
+    setData({
+      name: "",
+      location: "",
+      surface: "",
+      price: "",
+      photos: [],
+      documents: [],
+    });
+    onClose?.();
+    setOpenConfirmDialog(true);
+    console.log(submitted);
+  };
 
   return (
     <Box>
-      <Typography variant="h6" sx={{ mb: 3, fontWeight: 700 }}>
+      <Typography
+        variant="h6"
+        sx={{
+          mb: 3,
+          fontWeight: 700,
+          textAlign: "center",
+          color: "primary.main",
+        }}
+      >
         Ajouter un nouveau terrain
       </Typography>
 
-      {submitted ? (
-        <Box>
-          <Typography sx={{ fontWeight: 700, color: "green", mt: 3 }}>
-            Soumis
-          </Typography>
-          <Typography color="text.secondary">
-            Votre terrain a été soumis avec succès.
-          </Typography>
-          <Button
-            sx={{ borderRadius: 0.6, mt: 2, textTransform: "none" }}
-            variant="text"
-            onClick={() => {
-              onClose?.();
-            }}
-          >
-            Fermer
-          </Button>
-        </Box>
-      ) : (
-        <Box>
-          {step === 0 && (
-            <Step1 data={data} errors={errors} onChange={handleDataChange} />
+      <Box>
+        {step === 0 && (
+          <Step1 data={data} errors={errors} onChange={handleDataChange} />
+        )}
+
+        {step === 1 && (
+          <Step2 data={data} errors={errors} onChange={handleDataChange} />
+        )}
+
+        {step === 2 && <Step3 data={data} />}
+
+        <Box
+          sx={{ display: "flex", gap: 1, mt: 3, justifyContent: "flex-end" }}
+        >
+          {step > 0 && (
+            <Button
+              sx={{ borderRadius: 0.6, textTransform: "none" }}
+              variant="outlined"
+              onClick={prev}
+            >
+              Précédent
+            </Button>
           )}
 
-          {step === 1 && (
-            <Step2 data={data} errors={errors} onChange={handleDataChange} />
+          {step < 2 && (
+            <Button
+              sx={{ borderRadius: 0.6, textTransform: "none" }}
+              variant="contained"
+              onClick={next}
+            >
+              Suivant
+            </Button>
           )}
 
-          {step === 2 && <Step3 data={data} />}
-
-          <Box
-            sx={{ display: "flex", gap: 1, mt: 3, justifyContent: "flex-end" }}
-          >
-            {step > 0 && (
-              <Button
-                sx={{ borderRadius: 0.6, textTransform: "none" }}
-                variant="outlined"
-                onClick={prev}
-              >
-                Précédent
-              </Button>
-            )}
-
-            {step < 2 && (
-              <Button
-                sx={{ borderRadius: 0.6, textTransform: "none" }}
-                variant="contained"
-                onClick={next}
-              >
-                Suivant
-              </Button>
-            )}
-
-            {step === 2 && (
-              <Button
-                sx={{ borderRadius: 0.6, textTransform: "none" }}
-                variant="contained"
-                color="success"
-                onClick={() => {
-                  // final validation
-                  if (validateStep(0) && validateStep(1)) {
-                    setSubmitted(true);
-                    onClose?.();
-                  }
-                }}
-              >
-                Soumettre
-              </Button>
-            )}
-          </Box>
+          {step === 2 && (
+            <Button
+              sx={{ borderRadius: 0.6, textTransform: "none" }}
+              variant="contained"
+              color="success"
+              onClick={handleSubmit}
+            >
+              Soumettre
+            </Button>
+          )}
         </Box>
-      )}
+      </Box>
+
+      <SuccessDialog
+        open={openConfirmDialog}
+        onClose={() => setOpenConfirmDialog(false)}
+      />
     </Box>
   );
 }

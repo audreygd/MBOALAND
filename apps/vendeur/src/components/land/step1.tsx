@@ -1,4 +1,4 @@
-import { Box, TextField } from "@mui/material";
+import { Box, TextField, Typography } from "@mui/material";
 import type { Dispatch, SetStateAction } from "react";
 
 type FullData = {
@@ -20,40 +20,51 @@ export default function Step1({
   onChange: Dispatch<SetStateAction<Partial<FullData>>>;
 }) {
   return (
-    <Box sx={{ display: "grid", gap: 2, gridTemplateColumns: "1fr 1fr" }}>
-      <TextField
-        label="Nom du terrain"
-        value={data.name}
-        onChange={(e) => onChange({ name: e.target.value })}
-        error={!!errors?.name}
-        helperText={errors?.name}
-        fullWidth
-        variant="outlined"
-      />
-      <TextField
-        label="Localisation"
-        value={data.location}
-        onChange={(e) => onChange({ location: e.target.value })}
-        error={!!errors?.location}
-        helperText={errors?.location}
-        fullWidth
-      />
-      <TextField
-        label="Superficie"
-        value={data.surface}
-        onChange={(e) => onChange({ surface: e.target.value })}
-        error={!!errors?.surface}
-        helperText={errors?.surface}
-        fullWidth
-      />
-      <TextField
-        label="Prix"
-        value={data.price}
-        onChange={(e) => onChange({ price: e.target.value })}
-        error={!!errors?.price}
-        helperText={errors?.price}
-        fullWidth
-      />
-    </Box>
+    <>
+      <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 3 }}>
+        Informations du terrain
+      </Typography>
+      <Box
+        sx={{ display: "grid", gap: 6, gridTemplateColumns: "1fr 1fr", mt: 6 }}
+      >
+        <TextField
+          label="Nom du terrain"
+          value={data.name}
+          onChange={(e) => onChange({ name: e.target.value })}
+          error={!!errors?.name}
+          helperText={errors?.name}
+          fullWidth
+          variant="outlined"
+          required
+        />
+        <TextField
+          label="Localisation"
+          value={data.location}
+          onChange={(e) => onChange({ location: e.target.value })}
+          error={!!errors?.location}
+          helperText={errors?.location}
+          fullWidth
+          required
+        />
+        <TextField
+          label="Superficie"
+          value={data.surface}
+          onChange={(e) => onChange({ surface: e.target.value })}
+          error={!!errors?.surface}
+          helperText={errors?.surface}
+          fullWidth
+          required
+        />
+        <TextField
+          label="Prix"
+          value={data.price}
+          onChange={(e) => onChange({ price: e.target.value })}
+          error={!!errors?.price}
+          helperText={errors?.price}
+          fullWidth
+          required
+        />
+      </Box>
+    </>
   );
 }

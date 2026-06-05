@@ -32,6 +32,7 @@ export const LandPage = () => {
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState<FormData | null>(null);
   const steps = ["Informations", "Photos & Documents", "Validation"];
+
   return (
     <Box sx={{ bgcolor: "#f8fafc" }}>
       <Box
@@ -158,33 +159,41 @@ export const LandPage = () => {
             />
 
             {/* Image Preview Card */}
-            {formData?.photos && formData.photos.length > 0 && (
-              <Box>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 2 }}>
-                  Aperçu des photos
-                </Typography>
-                <Box
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns:
-                      "repeat(auto-fill, minmax(120px, 1fr))",
-                    gap: 2,
-                  }}
-                >
-                  {formData.photos.map((file, index) => (
-                    <Card key={index} sx={{ height: 120, overflow: "hidden" }}>
-                      <CardMedia
-                        component="img"
-                        height="120"
-                        image={URL.createObjectURL(file)}
-                        alt={`Photo ${index + 1}`}
-                        sx={{ objectFit: "cover" }}
-                      />
-                    </Card>
-                  ))}
+            {formData?.photos &&
+              formData.photos.length > 0 &&
+              (step === 1 || step === 2) && (
+                <Box>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ fontWeight: 700, mb: 2 }}
+                  >
+                    Aperçu des photos
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns:
+                        "repeat(auto-fill, minmax(120px, 1fr))",
+                      gap: 2,
+                    }}
+                  >
+                    {formData.photos.map((file, index) => (
+                      <Card
+                        key={index}
+                        sx={{ height: 120, overflow: "hidden" }}
+                      >
+                        <CardMedia
+                          component="img"
+                          height="120"
+                          image={URL.createObjectURL(file)}
+                          alt={`Photo ${index + 1}`}
+                          sx={{ objectFit: "cover" }}
+                        />
+                      </Card>
+                    ))}
+                  </Box>
                 </Box>
-              </Box>
-            )}
+              )}
           </Box>
         </DialogContent>
       </Dialog>
