@@ -8,6 +8,10 @@ import {
   Avatar,
 } from "@mui/material";
 
+type HeaderProps = {
+  title?: string;
+};
+
 function BellIcon({ size = 30 }: { size?: number }) {
   return (
     <svg
@@ -61,10 +65,10 @@ function CaretDownIcon({ size = 30 }: { size?: number }) {
   );
 }
 
-export default function Header() {
+export default function Header({ title = "Tableau de bord" }: HeaderProps) {
   return (
     <AppBar
-      position="static"
+      position="sticky"
       color="inherit"
       elevation={0}
       sx={{ borderBottom: "1px solid #e5e7eb" }}
@@ -72,7 +76,7 @@ export default function Header() {
       <Toolbar sx={{ justifyContent: "space-between", px: 4, py: 3 }}>
         <Box>
           <Typography variant="h6" sx={{ fontWeight: 700 }}>
-            Tableau de bord
+            {title}
           </Typography>
         </Box>
 
