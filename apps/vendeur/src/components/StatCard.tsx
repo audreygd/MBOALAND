@@ -46,7 +46,7 @@ export default function StatCard({
       </Typography>
       <Typography
         color="text.secondary"
-        sx={{ mt: 1, fontSize: 14, fontWeight: 500 }}
+        sx={{ mt: 1, fontSize: 16, fontWeight: 500 }}
       >
         {description}
       </Typography>

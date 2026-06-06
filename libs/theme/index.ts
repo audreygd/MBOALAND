@@ -8,6 +8,10 @@ export const theme = createTheme({
     background: {
       default: "#f8fafc",
     },
+    text: {
+      primary: "#55565B",
+      secondary: "#232429",
+    },
   },
 
   shape: {
