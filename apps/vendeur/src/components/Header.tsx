@@ -71,9 +71,9 @@ export default function Header({ title = "Tableau de bord" }: HeaderProps) {
       position="sticky"
       color="inherit"
       elevation={0}
-      sx={{ borderBottom: "1px solid #e5e7eb" }}
+      sx={{ borderBottom: "1px solid #e5e7eb", height: "100px" }}
     >
-      <Toolbar sx={{ justifyContent: "space-between", px: 4, py: 3 }}>
+      <Toolbar sx={{ justifyContent: "space-between", px: 4, py: 2 }}>
         <Box>
           <Typography variant="h6" sx={{ fontWeight: 700 }}>
             {title}

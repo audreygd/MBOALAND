@@ -104,6 +104,7 @@ export default function LandDetailsDrawer({ open, onClose }: Props) {
   return (
     <Drawer
       anchor="right"
+      title="Details du terrain"
       open={open}
       onClose={onClose}
       ModalProps={{
