@@ -93,70 +93,73 @@ export default function AddLandForm({
   };
 
   return (
-    <Box>
-      <Typography
-        variant="h6"
-        sx={{
-          mb: 3,
-          fontWeight: 700,
-          textAlign: "center",
-          color: "primary.main",
-        }}
-      >
-        Ajouter un nouveau terrain
-      </Typography>
-
+    <>
       <Box>
-        {step === 0 && (
-          <Step1 data={data} errors={errors} onChange={handleDataChange} />
-        )}
-
-        {step === 1 && (
-          <Step2 data={data} errors={errors} onChange={handleDataChange} />
-        )}
-
-        {step === 2 && <Step3 data={data} />}
-
-        <Box
-          sx={{ display: "flex", gap: 1, mt: 3, justifyContent: "flex-end" }}
+        <Typography
+          variant="h6"
+          sx={{
+            mb: 3,
+            fontWeight: 700,
+            textAlign: "center",
+            color: "primary.main",
+          }}
         >
-          {step > 0 && (
-            <Button
-              sx={{ borderRadius: 0.6, textTransform: "none" }}
-              variant="outlined"
-              onClick={prev}
-            >
-              Précédent
-            </Button>
+          Ajouter un nouveau terrain
+        </Typography>
+
+        <Box>
+          {step === 0 && (
+            <Step1 data={data} errors={errors} onChange={handleDataChange} />
           )}
 
-          {step < 2 && (
-            <Button
-              sx={{ borderRadius: 0.6, textTransform: "none" }}
-              variant="contained"
-              onClick={next}
-            >
-              Suivant
-            </Button>
+          {step === 1 && (
+            <Step2 data={data} errors={errors} onChange={handleDataChange} />
           )}
 
-          {step === 2 && (
-            <Button
-              sx={{ borderRadius: 0.6, textTransform: "none" }}
-              variant="contained"
-              color="success"
-              onClick={handleSubmit}
-            >
-              Soumettre
-            </Button>
-          )}
+          {step === 2 && <Step3 data={data} />}
+
+          <Box
+            sx={{ display: "flex", gap: 1, mt: 3, justifyContent: "flex-end" }}
+          >
+            {step > 0 && (
+              <Button
+                sx={{ borderRadius: 0.6, textTransform: "none" }}
+                variant="outlined"
+                onClick={prev}
+              >
+                Précédent
+              </Button>
+            )}
+
+            {step < 2 && (
+              <Button
+                sx={{ borderRadius: 0.6, textTransform: "none" }}
+                variant="contained"
+                onClick={next}
+              >
+                Suivant
+              </Button>
+            )}
+
+            {step === 2 && (
+              <Button
+                sx={{ borderRadius: 0.6, textTransform: "none" }}
+                variant="contained"
+                color="success"
+                onClick={handleSubmit}
+              >
+                Soumettre
+              </Button>
+            )}
+          </Box>
         </Box>
       </Box>
-
-      <SuccessDialog
-        open={openConfirmDialog}
-        onClose={() => setOpenConfirmDialog(false)}
-      />
-    </Box>
+      {openConfirmDialog && (
+        <SuccessDialog
+          open={openConfirmDialog}
+          onClose={() => setOpenConfirmDialog(false)}
+        />
+      )}
+    </>
   );
 }

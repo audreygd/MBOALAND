@@ -34,13 +34,20 @@ export const LandPage = () => {
   const steps = ["Informations", "Photos & Documents", "Validation"];
 
   return (
-    <Box sx={{ bgcolor: "#f8fafc" }}>
+    <Box
+      sx={{
+        bgcolor: "#f8fafc",
+        height: "100%",
+        position: "sticky",
+        flex: 1,
+      }}
+    >
       <Box
         sx={{
           position: "sticky",
-          top: 104,
           bgcolor: "#f8fafc",
           py: 2,
+          height: "25%",
         }}
       >
         <Box sx={{ display: "flex", justifyContent: "flex-end", px: 2 }}>
@@ -102,8 +109,8 @@ export const LandPage = () => {
         </Row>
       </Box>
 
-      <Box sx={{ m: 2, overflow: "auto" }}>
-        <Box>
+      <Box sx={{ m: 2, overflow: "hidden", height: "75%", flex: 1, mb: 3 }}>
+        <Box sx={{ overflow: "hidden" }}>
           <LandTable />
         </Box>
       </Box>

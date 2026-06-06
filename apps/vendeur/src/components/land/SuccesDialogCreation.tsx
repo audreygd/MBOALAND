@@ -14,7 +14,7 @@ interface SuccessDialogProps {
 
 export default function SuccessDialog({ open, onClose }: SuccessDialogProps) {
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle
         sx={{
           fontWeight: 700,

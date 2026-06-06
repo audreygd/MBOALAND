@@ -6,6 +6,7 @@ import SellerDashboard from "./page/SellerDashboard";
 import TransactionPage from "./page/Transactions";
 import { Box, Typography } from "@mui/material";
 import LandPage from "./page/LandPage";
+import Row from "./components/Row";
 
 const PagePlaceholder = ({
   title,
@@ -24,7 +25,7 @@ const PagePlaceholder = ({
   </Box>
 );
 
-function App() {
+function VendeurApp() {
   const [selectedMenu, setSelectedMenu] = useState("Tableau de bord");
 
   useEffect(() => {
@@ -127,14 +128,20 @@ function App() {
   };
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh", position: "sticky" }}>
-      <Sidebar selectedItem={selectedMenu} onMenuItemClick={handleMenuSelect} />
+    <Row sx={{ display: "flex", height: "100vh", position: "sticky", gap: 0 }}>
+      <Box sx={{ width: 260 }}>
+        <Sidebar
+          selectedItem={selectedMenu}
+          onMenuItemClick={handleMenuSelect}
+        />
+      </Box>
+
       <Box sx={{ flex: 1 }}>
         <Header title={selectedMenu} />
         {renderContent()}
       </Box>
-    </Box>
+    </Row>
   );
 }
 
-export default App;
+export default VendeurApp;

@@ -33,6 +33,42 @@ const lands = [
     price: "18 000 000 FCFA",
     status: "En vente",
   },
+  {
+    name: "Terrain à Odza",
+    surface: "1000 m²",
+    price: "15 000 000 FCFA",
+    status: "En vente",
+  },
+  {
+    name: "Terrain à Kribi",
+    surface: "2000 m²",
+    price: "25 000 000 FCFA",
+    status: "En attente",
+  },
+  {
+    name: "Terrain à Douala",
+    surface: "450 m²",
+    price: "18 000 000 FCFA",
+    status: "En vente",
+  },
+  {
+    name: "Terrain à Odza",
+    surface: "1000 m²",
+    price: "15 000 000 FCFA",
+    status: "En vente",
+  },
+  {
+    name: "Terrain à Kribi",
+    surface: "2000 m²",
+    price: "25 000 000 FCFA",
+    status: "En attente",
+  },
+  {
+    name: "Terrain à Douala",
+    surface: "450 m²",
+    price: "18 000 000 FCFA",
+    status: "En vente",
+  },
 ];
 
 interface LandTableProps {
@@ -105,7 +141,7 @@ export default function LandTable({ showAll }: LandTableProps) {
             </TableRow>
           </TableHead>
 
-          <TableBody>
+          <TableBody sx={{ overflow: "scroll" }}>
             {lands.map((land) => (
               <TableRow key={land.name}>
                 <TableCell>{land.name}</TableCell>
