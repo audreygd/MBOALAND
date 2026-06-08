@@ -1,13 +1,14 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import VendeurApp from "../apps/vendeur/src/App";
 import RoleSelectionPage from "./auth/SelectRole";
+import AcheteurApp from "../apps/acheteur/src/App";
 
 // function SellerPage() {
 //   return <h1>Espace Vendeur</h1>;
 // }
 
 function BuyerPage() {
-  return <h1>Espace Acheteur</h1>;
+   return <AcheteurApp />
 }
 
 function AdminPage() {
