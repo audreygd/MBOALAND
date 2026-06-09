@@ -81,9 +81,9 @@ export default function Sidebar({
     <Drawer
       variant="permanent"
       sx={{
-        width: 260,
+        width: 280,
         "& .MuiDrawer-paper": {
-          width: 260,
+          width: 280,
           borderRight: "1px solid #e5e7eb",
         },
       }}
