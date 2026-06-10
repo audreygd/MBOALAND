@@ -1,10 +1,10 @@
 import "./index.css";
-import App from "./App";
 import ReactDOM from "react-dom/client";
 import { MissionsProvider } from "./context/MissionsContext";
+import GeometreApp from "./App";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <MissionsProvider>
-    <App />
-  </MissionsProvider>
+    <GeometreApp />
+  </MissionsProvider>,
 );
