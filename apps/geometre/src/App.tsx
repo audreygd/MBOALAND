@@ -28,24 +28,42 @@ type Page =
   | "messagerie"
   | "profil";
 
-export default function App() {
-  const [page, setPage]                           = useState<Page>("dashboard");
-  const [selectedMissionId, setSelectedMissionId] = useState<number | null>(null);
-  const [selectedIndex, setSelectedIndex]         = useState(0);
+export default function GeometreApp() {
+  const [page, setPage] = useState<Page>("dashboard");
+  const [selectedMissionId, setSelectedMissionId] = useState<number | null>(
+    null,
+  );
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   // Navigation depuis la sidebar
   const handleNavigate = (index: number) => {
     setSelectedIndex(index);
-    const pages: Page[] = ["dashboard", "missions", "carte", "notifications", "messagerie", "profil"];
+    const pages: Page[] = [
+      "dashboard",
+      "missions",
+      "carte",
+      "notifications",
+      "messagerie",
+      "profil",
+    ];
     setPage(pages[index] ?? "dashboard");
   };
 
   // Navigation depuis le header (icônes + menu avatar)
   const handleHeaderNavigate = (p: string) => {
     switch (p) {
-      case "notifications": setPage("notifications"); setSelectedIndex(3); break;
-      case "messagerie":    setPage("messagerie");    setSelectedIndex(4); break;
-      case "profil":        setPage("profil");        setSelectedIndex(5); break;
+      case "notifications":
+        setPage("notifications");
+        setSelectedIndex(3);
+        break;
+      case "messagerie":
+        setPage("messagerie");
+        setSelectedIndex(4);
+        break;
+      case "profil":
+        setPage("profil");
+        setSelectedIndex(5);
+        break;
     }
   };
 
@@ -60,12 +78,32 @@ export default function App() {
   };
 
   const menuItems = [
-    { title: "Dashboard",      icon: <DashboardIcon />,     onClick: () => handleNavigate(0) },
-    { title: "Missions",       icon: <AssignmentIcon />,    onClick: () => handleNavigate(1) },
-    { title: "Carte terrain",  icon: <MapIcon />,            onClick: () => handleNavigate(2) },
-    { title: "Notifications",  icon: <NotificationsIcon />,  onClick: () => handleNavigate(3) },
-    { title: "Messagerie",     icon: <ChatIcon />,            onClick: () => handleNavigate(4) },
-    { title: "Profil",         icon: <PersonIcon />,          onClick: () => handleNavigate(5) },
+    {
+      title: "Dashboard",
+      icon: <DashboardIcon />,
+      onClick: () => handleNavigate(0),
+    },
+    {
+      title: "Missions",
+      icon: <AssignmentIcon />,
+      onClick: () => handleNavigate(1),
+    },
+    {
+      title: "Carte terrain",
+      icon: <MapIcon />,
+      onClick: () => handleNavigate(2),
+    },
+    {
+      title: "Notifications",
+      icon: <NotificationsIcon />,
+      onClick: () => handleNavigate(3),
+    },
+    {
+      title: "Messagerie",
+      icon: <ChatIcon />,
+      onClick: () => handleNavigate(4),
+    },
+    { title: "Profil", icon: <PersonIcon />, onClick: () => handleNavigate(5) },
   ];
 
   return (
@@ -84,15 +122,18 @@ export default function App() {
         <Header onNavigate={handleHeaderNavigate} />
 
         <Box sx={{ flex: 1 }}>
-          {page === "dashboard"      && <Dashboard />}
-          {page === "missions"       && <Missions onViewDetail={handleViewDetail} />}
+          {page === "dashboard" && <Dashboard />}
+          {page === "missions" && <Missions onViewDetail={handleViewDetail} />}
           {page === "mission-detail" && selectedMissionId !== null && (
-            <MissionsDetails missionId={selectedMissionId} onBack={handleBack} />
+            <MissionsDetails
+              missionId={selectedMissionId}
+              onBack={handleBack}
+            />
           )}
-          {page === "carte"          && <CarteTerrain />}
-          {page === "notifications"  && <Notifications />}
-          {page === "messagerie"     && <Messagerie />}
-          {page === "profil"         && <Profil />}
+          {page === "carte" && <CarteTerrain />}
+          {page === "notifications" && <Notifications />}
+          {page === "messagerie" && <Messagerie />}
+          {page === "profil" && <Profil />}
         </Box>
       </Box>
     </Box>
