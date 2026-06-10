@@ -35,12 +35,9 @@ import {
   canEditTechnical,
   getMissionSteps,
 } from "../lib/missionUtils";
+import { useParams } from "react-router-dom";
+import { useGeometreNavigation } from "../hooks/useGeometreNavigation";
 import type { MissionTechnicalData } from "../types";
-
-interface Props {
-  missionId: number;
-  onBack?: () => void;
-}
 
 function InfoRow({
   icon,
@@ -78,7 +75,12 @@ function ReadOnlyBanner() {
   );
 }
 
-export default function MissionsDetails({ missionId, onBack }: Props) {
+export default function MissionsDetails() {
+  const { id } = useParams<{ id: string }>();
+  const { goTo } = useGeometreNavigation();
+  const missionId = Number(id);
+  const onBack = () => goTo("missions");
+
   const { getMission, updateTechnical, startMission, submitReport } = useMissions();
   const mission = getMission(missionId);
 

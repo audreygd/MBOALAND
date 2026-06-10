@@ -1,10 +1,17 @@
-import "./index.css";
-import App from "./App";
+import React from "react";
 import ReactDOM from "react-dom/client";
-import { MissionsProvider } from "./context/MissionsContext";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import GeometreApp from "./App";
+import { geometreLayoutRoutes } from "./geometreRoutes";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <MissionsProvider>
-    <App />
-  </MissionsProvider>
+  <React.StrictMode>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<GeometreApp />}>
+          {geometreLayoutRoutes}
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  </React.StrictMode>,
 );

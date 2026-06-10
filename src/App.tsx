@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import VendeurApp from "../apps/vendeur/src/App";
+import GeometreApp from "../apps/geometre/src/App";
+import { geometreLayoutRoutes } from "../apps/geometre/src/geometreRoutes";
 import RoleSelectionPage from "./auth/SelectRole";
 
 // function SellerPage() {
@@ -18,9 +20,7 @@ function NotaryPage() {
   return <h1>Espace Notaire</h1>;
 }
 
-function SurveyorPage() {
-  return <h1>Espace Géomètre</h1>;
-}
+
 
 export default function App() {
   return (
@@ -35,7 +35,9 @@ export default function App() {
         <Route path="/buyer" element={<BuyerPage />} />
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/notary" element={<NotaryPage />} />
-        <Route path="/surveyor" element={<SurveyorPage />} />
+        <Route path="/surveyor" element={<GeometreApp />}>
+          {geometreLayoutRoutes}
+        </Route>
       </Routes>
     </BrowserRouter>
   );

@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import "leaflet/dist/leaflet.css";
+import { useGeometreNavigation } from "../hooks/useGeometreNavigation";
 import {
   Box,
   Typography,
@@ -36,6 +38,7 @@ const ZONES = [
 ];
 
 export default function CarteTerrain() {
+  const { goTo } = useGeometreNavigation();
   const mapRef         = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<unknown>(null);
   const markersRef     = useRef<unknown[]>([]);
@@ -78,6 +81,15 @@ export default function CarteTerrain() {
         mapInstanceRef.current = null;
       }
     };
+  }, []);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      if (!mapInstanceRef.current) return;
+      // @ts-expect-error - Leaflet map instance
+      mapInstanceRef.current.invalidateSize?.();
+    }, 150);
+    return () => window.clearTimeout(timer);
   }, []);
 
   // Mise à jour des marqueurs
@@ -243,6 +255,25 @@ export default function CarteTerrain() {
                 </Box>
               ))}
               <Chip label={selectedMission.status} color={STATUS_MUI[selectedMission.status]} size="small" sx={{ mt: 1, fontWeight: 600 }} />
+              <Box
+                component="button"
+                onClick={() => goTo(`missions/${selectedMission.id}`)}
+                sx={{
+                  mt: 1.5,
+                  width: "100%",
+                  border: "none",
+                  borderRadius: 1.5,
+                  py: 1,
+                  bgcolor: "#10b981",
+                  color: "#fff",
+                  fontWeight: 600,
+                  fontSize: 12,
+                  cursor: "pointer",
+                  "&:hover": { bgcolor: "#059669" },
+                }}
+              >
+                Voir la mission
+              </Box>
             </Box>
           )}
         </Paper>

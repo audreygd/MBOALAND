@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useGeometreNavigation } from "../hooks/useGeometreNavigation";
 import {
   Box, Typography, TextField, InputAdornment, Chip,
   Table, TableHead, TableRow, TableCell, TableBody,
@@ -11,10 +12,6 @@ import { useMissions } from "../context/MissionsContext";
 import { STATUS_CHIP_COLOR, STATUS_LABELS } from "../lib/missionUtils";
 import type { MissionStatus } from "../types";
 
-interface Props {
-  onViewDetail?: (id: number) => void;
-}
-
 const STATUS_FILTERS: { label: string; value: MissionStatus | "toutes" }[] = [
   { label: "Toutes",        value: "toutes"               },
   { label: "Assignée",      value: "assignée"             },
@@ -23,7 +20,8 @@ const STATUS_FILTERS: { label: string; value: MissionStatus | "toutes" }[] = [
   { label: "Terminée",      value: "terminée"             },
 ];
 
-export default function Missions({ onViewDetail }: Props) {
+export default function Missions() {
+  const { goTo } = useGeometreNavigation();
   const { missions, resetDemo } = useMissions();
   const [filtre,    setFiltre]    = useState<MissionStatus | "toutes">("toutes");
   const [recherche, setRecherche] = useState("");
@@ -126,7 +124,7 @@ export default function Missions({ onViewDetail }: Props) {
               missionsFiltrees.map((m) => (
                 <TableRow key={m.id}
                   sx={{ "&:hover": { bgcolor: "#f8fafc" }, cursor: "pointer" }}
-                  onClick={() => onViewDetail?.(m.id)}
+                  onClick={() => goTo(`missions/${m.id}`)}
                 >
                   <TableCell>
                     <Typography sx={{ fontWeight: 600, fontSize: 14 }}>{m.title}</Typography>
@@ -164,7 +162,7 @@ export default function Missions({ onViewDetail }: Props) {
                   </TableCell>
                   <TableCell align="center" onClick={(e) => e.stopPropagation()}>
                     <Tooltip title="Voir le détail">
-                      <IconButton size="small" onClick={() => onViewDetail?.(m.id)} sx={{ color: "#10b981" }}>
+                      <IconButton size="small" onClick={() => goTo(`missions/${m.id}`)} sx={{ color: "#10b981" }}>
                         <VisibilityIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
