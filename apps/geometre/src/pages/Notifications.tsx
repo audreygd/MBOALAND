@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useGeometreNavigation } from "../hooks/useGeometreNavigation";
 import {
   Box,
   Typography,
@@ -46,6 +47,7 @@ const MOCK_NOTIFS: Notif[] = [
 ];
 
 export default function Notifications() {
+  const { goTo } = useGeometreNavigation();
   const [notifs, setNotifs] = useState<Notif[]>(MOCK_NOTIFS);
   const [onglet, setOnglet] = useState(0); // 0=Toutes, 1=Non lues, 2=Lues
 
@@ -68,6 +70,17 @@ export default function Notifications() {
 
   const toutSupprimer = () =>
     setNotifs((prev) => prev.filter((n) => n.lu));
+
+  const ouvrirNotif = (notif: Notif) => {
+    marquerLu(notif.id);
+    if (notif.type === "message") {
+      goTo("messagerie");
+      return;
+    }
+    if (notif.type === "mission" || notif.type === "validation" || notif.type === "update" || notif.type === "alerte") {
+      goTo("missions");
+    }
+  };
 
   return (
     <Box sx={{ bgcolor: "#f8fafc", minHeight: "100vh", p: 4 }}>
@@ -135,6 +148,7 @@ export default function Notifications() {
             return (
               <Box key={n.id}>
                 <Box
+                  onClick={() => ouvrirNotif(n)}
                   sx={{
                     display: "flex",
                     alignItems: "flex-start",
@@ -143,6 +157,7 @@ export default function Notifications() {
                     py: 2,
                     bgcolor: n.lu ? "transparent" : cfg.bg,
                     transition: "background 0.2s",
+                    cursor: "pointer",
                     "&:hover": { bgcolor: "#f9fafb" },
                   }}
                 >
@@ -182,7 +197,7 @@ export default function Notifications() {
                   </Box>
 
                   {/* Actions */}
-                  <Box sx={{ display: "flex", gap: 0.5, flexShrink: 0 }}>
+                  <Box sx={{ display: "flex", gap: 0.5, flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
                     {!n.lu && (
                       <IconButton size="small" onClick={() => marquerLu(n.id)} title="Marquer comme lu">
                         <CheckCircleOutlinedIcon sx={{ fontSize: 18, color: "#10b981" }} />

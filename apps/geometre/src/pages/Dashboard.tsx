@@ -1,14 +1,12 @@
 import { Box, Typography, Link } from "@mui/material";
+import { useGeometreNavigation } from "../hooks/useGeometreNavigation";
 import StatCard from "../components/Statcard";
 import MissionCard from "../components/MissionCard";
 import GraphCard from "../components/GraphCard";
 import { useMissions } from "../context/MissionsContext";
 
-interface Props {
-  onViewDetail?: (id: number) => void;
-}
-
-export default function Dashboard({ onViewDetail }: Props) {
+export default function Dashboard() {
+  const { goTo } = useGeometreNavigation();
   const { missions } = useMissions();
   const recentMissions = missions.slice(0, 3);
 
@@ -103,7 +101,7 @@ export default function Dashboard({ onViewDetail }: Props) {
               <MissionCard
                 key={mission.id}
                 mission={mission}
-                onOpen={() => onViewDetail?.(mission.id)}
+                onOpen={() => goTo(`missions/${mission.id}`)}
               />
             ))}
           </Box>
