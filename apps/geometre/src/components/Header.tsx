@@ -83,7 +83,7 @@ export default function Header({ onNavigate }: HeaderProps) {
   const marquerLu     = (id: number) => setNotifs((p) => p.map((n) => n.id === id ? { ...n, lu: true } : n));
   const toutMarquerLu = () => setNotifs((p) => p.map((n) => ({ ...n, lu: true })));
 
-  // sx partagé pour les popover — ✅ slotProps à la place de PaperProps
+  // sx partagé pour les popover —  slotProps à la place de PaperProps
   const popoverSx = { borderRadius: 2, boxShadow: "0 8px 30px rgba(0,0,0,0.12)" };
 
   return (
@@ -113,7 +113,7 @@ export default function Header({ onNavigate }: HeaderProps) {
             onClose={() => setNotifAnchor(null)}
             anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
             transformOrigin={{ vertical: "top", horizontal: "right" }}
-            // ✅ slotProps au lieu de PaperProps
+            // slotProps au lieu de PaperProps
             slotProps={{ paper: { sx: { width: 360, ...popoverSx } } }}
           >
             <Box sx={{ px: 2, py: 1.5, display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #f3f4f6" }}>
@@ -172,7 +172,7 @@ export default function Header({ onNavigate }: HeaderProps) {
             onClose={() => { setMsgAnchor(null); setMsgSel(null); setReponse(""); }}
             anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
             transformOrigin={{ vertical: "top", horizontal: "right" }}
-            // ✅ slotProps au lieu de PaperProps
+            // slotProps au lieu de PaperProps
             slotProps={{ paper: { sx: { width: 360, ...popoverSx } } }}
           >
             <Box sx={{ px: 2, py: 1.5, borderBottom: "1px solid #f3f4f6", display: "flex", alignItems: "center", gap: 1 }}>
@@ -277,7 +277,7 @@ export default function Header({ onNavigate }: HeaderProps) {
             onClose={() => setProfilAnchor(null)}
             anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
             transformOrigin={{ vertical: "top", horizontal: "right" }}
-            // ✅ slotProps au lieu de PaperProps
+            //  slotProps au lieu de PaperProps
             slotProps={{ paper: { sx: { width: 220, mt: 1, ...popoverSx } } }}
           >
             <Box sx={{ px: 2, py: 1.5, borderBottom: "1px solid #f3f4f6" }}>

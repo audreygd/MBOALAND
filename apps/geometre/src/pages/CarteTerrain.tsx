@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { MISSIONS, type Mission, type MissionStatus } from "../types";
 
-// ✅ en_attente_validation ajouté dans les deux records
+//  en_attente_validation ajouté dans les deux records
 const STATUS_COLOR: Record<MissionStatus, string> = {
   assignée:              "#3b82f6",
   en_cours:              "#f59e0b",

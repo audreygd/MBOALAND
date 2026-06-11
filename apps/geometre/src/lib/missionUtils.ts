@@ -48,7 +48,7 @@ export interface MissionStep {
 
 export function getMissionSteps(mission: Mission): MissionStep[] {
   const { status, technical } = mission;
-  // ✅ Accès aux bons champs de MissionTechnicalData
+  // Accès aux bons champs de MissionTechnicalData
   const hasGps        = Boolean(technical?.fichier_gps);
   const hasTechnical  =
     (technical?.nb_bornes ?? 0) > 0 &&

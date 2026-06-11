@@ -38,14 +38,14 @@ export default function StatCard({
     >
       {/* HEADER */}
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-        {/* ✅ color="text.secondary" valeur MUI — OK. fontWeight dans sx */}
+        {/*  color="text.secondary" valeur MUI — OK. fontWeight dans sx */}
         <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
           {title}
         </Typography>
         {icon && <Box sx={{ color: "#64748b" }}>{icon}</Box>}
       </Box>
 
-      {/* VALUE — ✅ tout dans sx, color vient de la prop */}
+      {/* VALUE — tout dans sx, color vient de la prop */}
       <Typography sx={{ color, fontWeight: 800, mt: 2, fontSize: 34 }}>
         {value}
       </Typography>

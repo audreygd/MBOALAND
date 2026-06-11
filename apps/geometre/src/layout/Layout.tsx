@@ -13,7 +13,7 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import ChatIcon from "@mui/icons-material/Chat";
 import PersonIcon from "@mui/icons-material/Person";
 
-// ✅ Chemins RELATIFS (sans "/" initial) — compatibles avec un montage
+// Chemins RELATIFS (sans "/" initial) — compatibles avec un montage
 // sous "/surveyor/*" comme en standalone "/"
 const items = [
   { title: "Dashboard",     path: "" },
@@ -37,7 +37,7 @@ export default function Layout() {
   const { goTo } = useGeometreNavigation();
   const location = useLocation();
 
-  // ✅ getActiveGeometreSegment gère aussi "/surveyor/missions/3" -> "missions"
+  // getActiveGeometreSegment gère aussi "/surveyor/missions/3" -> "missions"
   const activeSegment = getActiveGeometreSegment(location.pathname);
   const selectedIndex = items.findIndex((i) => i.path === activeSegment);
 
@@ -58,7 +58,7 @@ export default function Layout() {
       />
 
       <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-        {/* ✅ Header.onNavigate reçoit un segment relatif, goTo gère le préfixe /surveyor */}
+        {/* Header.onNavigate reçoit un segment relatif, goTo gère le préfixe /surveyor */}
         <Header onNavigate={(p) => goTo(p)} />
 
         <Box sx={{ flex: 1, overflow: "auto" }}>
