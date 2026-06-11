@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -25,6 +25,7 @@ import GavelIcon from "@mui/icons-material/Gavel";
 import StraightenIcon from "@mui/icons-material/Straighten";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 
+import { useGeometreNavigation } from "../hooks/useGeometreNavigation";
 import { useMissions } from "../context/MissionsContext";
 import {
   STATUS_CHIP_COLOR,
@@ -81,7 +82,8 @@ function ReadOnlyBanner() {
 /* ───────── Component ───────── */
 
 export default function MissionsDetails() {
-  const navigate = useNavigate();
+  // ✅ remplace useNavigate par useGeometreNavigation
+  const { goTo } = useGeometreNavigation();
   const { id } = useParams();
 
   const missionId = Number(id);
@@ -112,7 +114,8 @@ export default function MissionsDetails() {
     return (
       <Box sx={{ p: 4 }}>
         <Alert severity="error">Mission introuvable</Alert>
-        <Button sx={{ mt: 2 }} startIcon={<ArrowBackIcon />} onClick={() => navigate("/missions")}>
+        {/* ✅ "missions" relatif au lieu de "/missions" */}
+        <Button sx={{ mt: 2 }} startIcon={<ArrowBackIcon />} onClick={() => goTo("missions")}>
           Retour
         </Button>
       </Box>
@@ -156,14 +159,14 @@ export default function MissionsDetails() {
 
   return (
     <Box sx={{ bgcolor: "#f8fafc", minHeight: "100vh", p: 4 }}>
-      
+
       {/* HEADER */}
       <Box sx={{ display: "flex", justifyContent: "space-between", mb: 3, flexWrap: "wrap", gap: 2 }}>
-        
+
         <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
           <Button
             startIcon={<ArrowBackIcon />}
-            onClick={() => navigate("/missions")}
+            onClick={() => goTo("missions")}
             variant="outlined"
             size="small"
           >
@@ -186,8 +189,37 @@ export default function MissionsDetails() {
         />
       </Box>
 
+      {/* ÉTAPES */}
+      <Paper sx={{ p: 3, mb: 3 }}>
+        <Typography sx={{ fontWeight: 700, mb: 2 }}>
+          Avancement de la mission
+        </Typography>
+        <Stack
+  direction="row"
+  spacing={1}
+  sx={{
+    flexWrap: "wrap",
+    gap: 1,
+  }}
+>
+          {etapes.map((etape) => (
+            <Chip
+              key={etape.label}
+              label={etape.label}
+              size="small"
+              sx={{
+                fontWeight: 600,
+                bgcolor: etape.done ? "#f0fdf4" : "#f3f4f6",
+                color: etape.done ? "#15803d" : "#6b7280",
+                border: etape.done ? "1px solid #bbf7d0" : "1px solid #e5e7eb",
+              }}
+            />
+          ))}
+        </Stack>
+      </Paper>
+
       {/* ALERTS */}
-      {submitSuccess && <Alert severity="success">Rapport envoyé avec succès</Alert>}
+      {submitSuccess && <Alert severity="success" sx={{ mb: 2 }}>Rapport envoyé avec succès</Alert>}
 
       {submitErrors.length > 0 && (
         <Alert severity="error" sx={{ mb: 2 }}>

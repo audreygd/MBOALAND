@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   Box, Typography, TextField, InputAdornment, Chip,
   Table, TableHead, TableRow, TableCell, TableBody,
@@ -10,12 +9,14 @@ import SearchIcon from "@mui/icons-material/Search";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 
+import { useGeometreNavigation } from "../hooks/useGeometreNavigation";
 import { useMissions } from "../context/MissionsContext";
 import { STATUS_CHIP_COLOR, STATUS_LABELS } from "../lib/missionUtils";
 import type { MissionStatus } from "../types";
 
 export default function Missions() {
-  const navigate = useNavigate();
+  // ✅ remplace useNavigate (react-router) par useGeometreNavigation
+  const { goTo } = useGeometreNavigation();
 
   const { missions, resetDemo } = useMissions();
   const [filtre, setFiltre] = useState<MissionStatus | "toutes">("toutes");
@@ -55,8 +56,9 @@ export default function Missions() {
     }
   };
 
+  // ✅ chemin relatif "missions/3" — goTo ajoute le préfixe /surveyor si besoin
   const handleOpenMission = (id: number) => {
-    navigate(`/missions/${id}`);
+    goTo(`missions/${id}`);
   };
 
   return (
@@ -132,7 +134,12 @@ export default function Missions() {
 
           <TableBody>
             {missionsFiltrees.map((m) => (
-              <TableRow key={m.id} hover>
+              <TableRow
+                key={m.id}
+                hover
+                sx={{ cursor: "pointer" }}
+                onClick={() => handleOpenMission(m.id)}
+              >
                 <TableCell>{m.title}</TableCell>
                 <TableCell>{m.zone}</TableCell>
                 <TableCell>{m.admin?.superficie ?? "—"}</TableCell>
@@ -147,7 +154,7 @@ export default function Missions() {
                   />
                 </TableCell>
 
-                <TableCell align="center">
+                <TableCell align="center" onClick={(e) => e.stopPropagation()}>
                   <Tooltip title="Voir">
                     <IconButton
                       onClick={() => handleOpenMission(m.id)}
