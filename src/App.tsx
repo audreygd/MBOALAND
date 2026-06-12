@@ -2,10 +2,27 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import VendeurApp from "../apps/vendeur/src/App";
 import GeometreApp from "../apps/geometre/src/App";
 import RoleSelectionPage from "./auth/SelectRole";
-import { MissionsProvider } from "../apps/geometre/src/context/MissionsContext";
-function BuyerPage() { return <h1>Espace Acheteur</h1>; }
-function AdminPage()  { return <h1>Espace Admin</h1>; }
-function NotaryPage() { return <h1>Espace Notaire</h1>; }
+import AcheteurApp from "../apps/acheteur/src/App";
+
+// function SellerPage() {
+//   return <h1>Espace Vendeur</h1>;
+// }
+
+function BuyerPage() {
+   return <AcheteurApp />
+}
+
+function AdminPage() {
+  return <h1>Espace Admin</h1>;
+}
+
+function NotaryPage() {
+  return <h1>Espace Notaire</h1>;
+}
+
+function SurveyorPage() {
+  return <h1>Espace Géomètre</h1>;
+}
 
 export default function App() {
   return (
