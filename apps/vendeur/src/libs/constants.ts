@@ -1,0 +1,7 @@
+export const VisitStatus = {
+  PENDING: "PENDING",
+  CONFIRMED: "CONFIRMED",
+  COMPLETED: "COMPLETED",
+  CANCELLED: "CANCELLED",
+  MISSED: "MISSED",
+};

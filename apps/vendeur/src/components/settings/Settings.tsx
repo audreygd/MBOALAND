@@ -101,21 +101,6 @@ export default function SettingsPage() {
             }
             label="Email"
           />
-
-          <FormControlLabel
-            control={
-              <Switch
-                checked={notifications.app}
-                onChange={(e) =>
-                  setNotifications((prev) => ({
-                    ...prev,
-                    app: e.target.checked,
-                  }))
-                }
-              />
-            }
-            label="Application"
-          />
         </Stack>
 
         {/* sécurité */}

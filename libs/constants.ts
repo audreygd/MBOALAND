@@ -1,0 +1,7 @@
+export enum VisitStatus {
+  PENDING = "PENDING",
+  CONFIRMED = "CONFIRMED",
+  COMPLETED = "COMPLETED",
+  CANCELLED = "CANCELLED",
+  MISSED = "MISSED",
+}
