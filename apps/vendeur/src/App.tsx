@@ -12,6 +12,7 @@ import DocumentsPage from "./components/documents/DocumentsPage";
 import MessagingPage from "./components/messages/MessagesPage";
 import NotificationsPage from "./components/notifications/notifications";
 import SettingsPage from "./components/settings/Settings";
+import VisitsPage from "./page/VisitsPage";
 
 function VendeurApp() {
   const [selectedMenu, setSelectedMenu] = useState("Tableau de bord");
@@ -34,6 +35,8 @@ function VendeurApp() {
           return "Notifications";
         case "parametres":
           return "Paramètres";
+        case "visites":
+          return "Visites";
         default:
           return "Tableau de bord";
       }
@@ -68,6 +71,8 @@ function VendeurApp() {
         return <NotificationsPage />;
       case "Paramètres":
         return <SettingsPage />;
+      case "Visites":
+        return <VisitsPage />;
       default:
         return <SellerDashboard />;
     }
@@ -84,6 +89,7 @@ function VendeurApp() {
       Messagerie: "#messagerie",
       Notifications: "#notifications",
       Paramètres: "#parametres",
+      Visites: "#visites",
       "Tableau de bord": "#",
     };
     const newHash = mapMenuToHash[menu] ?? "#";
