@@ -4,6 +4,8 @@ import GeometreApp from "../apps/geometre/src/App";
 import RoleSelectionPage from "./auth/SelectRole";
 import AcheteurApp from "../apps/acheteur/src/App";
 import { MissionsProvider } from "../apps/geometre/src/context/MissionsContext";
+import NotaireApp from "../apps/notaire/src/App";
+import AdminApp from "../apps/admin/src/App";
 
 // function SellerPage() {
 //   return <h1>Espace Vendeur</h1>;
@@ -14,11 +16,11 @@ function BuyerPage() {
 }
 
 function AdminPage() {
-  return <h1>Espace Admin</h1>;
+  return <AdminApp />
 }
 
 function NotaryPage() {
-  return <h1>Espace Notaire</h1>;
+  return <NotaireApp />;
 }
 
 function SurveyorPage() {

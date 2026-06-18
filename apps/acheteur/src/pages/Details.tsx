@@ -12,6 +12,22 @@ interface DetailsProps {
 }
 
 export default function Details({ terrain, onBack, onBuy }: DetailsProps) {
+  
+  // Fonction utilitaire pour nettoyer les coordonnées et générer l'URL Google Maps Satellite [1]
+  const getGoogleMapsEmbedUrl = (gpsString: string) => {
+    // Nettoie les lettres N, E, S, W et les degrés pour obtenir un format pur (ex: "3.8842,11.5243") [1]
+    const cleanGps = gpsString
+      .replace(/°\s*N/gi, '')
+      .replace(/°\s*E/gi, '')
+      .replace(/°\s*S/gi, '-')
+      .replace(/°\s*O/gi, '-')
+      .replace(/°\s*W/gi, '-')
+      .trim();
+
+    // q = coordonnées, t = k (Satellite), z = 16 (Zoom) [1]
+    return `https://maps.google.com/maps?q=${encodeURIComponent(cleanGps)}&t=k&z=17&ie=UTF8&iwloc=&output=embed`;
+  };
+
   return (
     <div className="page-container">
       
@@ -55,21 +71,27 @@ export default function Details({ terrain, onBack, onBuy }: DetailsProps) {
             </p>
           </div>
 
-          {/* Section Cadastre & Géolocalisation */}
+          {/* Section Cadastre & Géolocalisation (INTÉGRATION GOOGLE MAPS SATELLITE DIRECTE) [1] */}
           <div className="details-box">
-            <h3 className="details-box-title">Cadastre & Coordonnées GPS</h3>
-            <div className="map-simulation-box" style={{ marginBottom: '1rem' }}>
-              <div className="map-background-cadastre" />
-              <div className="map-marker">
-                <div className="map-marker-pulse" />
-                <div className="map-marker-pin" />
-              </div>
+            <h3 className="details-box-title">Localisation Google Maps (Vue Satellite) [1]</h3>
+            
+            <div className="map-simulation-box" style={{ marginBottom: '1rem', height: '300px' }}>
+              {/* Carte Google Maps dynamique et interactive [1] */}
+              <iframe
+                title="Google Maps Cadastre"
+                src={getGoogleMapsEmbedUrl(terrain.gps)}
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+              ></iframe>
             </div>
-            {/* CORRECTION ICI : "justify" remplacé par "justifyContent" */}
+
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem' }}>
-              <span>Coordonnées certifiées : <strong>{terrain.gps}</strong></span>
+              <span>Coordonnées GPS réelles : <strong>{terrain.gps}</strong></span>
               <span className="text-emerald-700 font-bold flex items-center gap-1">
-                <Compass className="w-4 h-4" /> Relèvement Cadastral Certifié
+                <Compass className="w-4 h-4" /> Position vérifiée par GPS différentiel
               </span>
             </div>
           </div>
