@@ -1,0 +1,544 @@
+/* ==========================================================================
+   VARIABLES NOTAIRE (MBOALAND NOTARY WORKSPACE)
+   ========================================================================== */
+:root {
+  --notary-primary: #0a5c44;        /* Vert forêt officiel */
+  --notary-primary-dark: #05332c;   /* Vert canopée profond */
+  --notary-bg: #f8fafc;             /* Gris de fond clair */
+  --notary-surface: #ffffff;
+  --notary-border: #e2e8f0;         /* Bordures fines */
+  --notary-text: #1e293b;           /* Gris très foncé */
+  --notary-text-light: #64748b;     /* Gris moyen */
+  --notary-radius: 12px;
+  --notary-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+/* Layout Global Notaire */
+.notary-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+  background-color: var(--notary-bg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--notary-text);
+}
+
+/* Barre Latérale Gauche */
+.notary-sidebar {
+  background-color: var(--notary-surface);
+  border-right: 1px solid var(--notary-border);
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1rem;
+}
+
+.notary-logo-box {
+  margin-bottom: 2rem;
+  padding-left: 0.5rem;
+}
+
+.notary-logo-text {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: var(--notary-primary);
+}
+
+.notary-menu-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.notary-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.notary-menu-item:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+.notary-menu-item.active {
+  background-color: var(--notary-primary);
+  color: #ffffff;
+}
+
+.badge-count-notary {
+  background-color: #f59e0b;
+  color: white;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 100px;
+  margin-left: auto;
+  font-weight: 700;
+}
+
+/* Zone Principale */
+.notary-main-content {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.notary-top-header {
+  background-color: var(--notary-surface);
+  border-bottom: 1px solid var(--notary-border);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notary-header-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.notary-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #e2f2ec;
+}
+
+/* Conteneur interne */
+.notary-inner-container {
+  padding: 2rem;
+  flex: 1;
+}
+
+/* Grille de statistiques 2x2 */
+.notary-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.notary-stat-card {
+  background-color: var(--notary-surface);
+  border: 1px solid var(--notary-border);
+  border-radius: var(--notary-radius);
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: var(--notary-shadow);
+}
+
+.notary-stat-icon-wrapper {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notary-stat-icon-wrapper.blue { background-color: #eff6ff; color: #3b82f6; }
+.notary-stat-icon-wrapper.amber { background-color: #fffbeb; color: #f59e0b; }
+.notary-stat-icon-wrapper.green { background-color: #f0fdf4; color: #10b981; }
+.notary-stat-icon-wrapper.rose { background-color: #fef2f2; color: #f43f5e; }
+
+.notary-stat-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.notary-stat-label {
+  font-size: 0.78rem;
+  color: var(--notary-text-light);
+  margin-top: 0.2rem;
+  font-weight: 500;
+}
+
+/* Grille de contenu (Tableau de dossiers + Suivi à droite) */
+.notary-grid-content {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.notary-card-box {
+  background-color: var(--notary-surface);
+  border: 1px solid var(--notary-border);
+  border-radius: var(--notary-radius);
+  padding: 1.5rem;
+  box-shadow: var(--notary-shadow);
+}
+
+/* Filtres et Barre d'actions */
+.notary-filters-bar {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.notary-search-input {
+  flex: 1;
+  min-width: 180px;
+  height: 38px;
+  padding: 0 1rem;
+  border: 1px solid var(--notary-border);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.notary-search-input:focus {
+  border-color: var(--notary-primary);
+}
+
+.notary-select {
+  height: 38px;
+  padding: 0 1rem;
+  border: 1px solid var(--notary-border);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  background-color: var(--notary-surface);
+  outline: none;
+  font-weight: 600;
+  color: #475569;
+}
+
+/* Style de table de données */
+.notary-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+.notary-table th {
+  padding: 0.75rem 1rem;
+  border-bottom: 2px solid #f1f5f9;
+  color: var(--notary-text-light);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+}
+
+.notary-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.notary-row-clickable {
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.notary-row-clickable:hover {
+  background-color: #f8fafc;
+}
+
+.notary-row-clickable.active {
+  background-color: #f0fdf4;
+}
+
+.notary-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.notary-badge.pending { background-color: #fffbeb; color: #b45309; }
+.notary-badge.progress { background-color: #eff6ff; color: #1d4ed8; }
+.notary-badge.success { background-color: #f0fdf4; color: #15803d; }
+
+/* Tiroir de droite */
+.notary-drawer {
+  background-color: var(--notary-surface);
+  border: 1px solid var(--notary-border);
+  border-radius: var(--notary-radius);
+  padding: 1.5rem;
+  box-shadow: var(--notary-shadow);
+}
+
+.notary-drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 0.75rem;
+}
+
+/* Boutons */
+.btn-notary {
+  width: 100%;
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid var(--notary-border);
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-notary-primary {
+  background-color: var(--notary-primary);
+  color: #ffffff;
+  border: none;
+}
+
+.btn-notary-primary:hover {
+  background-color: var(--notary-primary-dark);
+}
+
+.btn-notary-outline {
+  background-color: #ffffff;
+  color: var(--notary-text);
+}
+
+.btn-notary-outline:hover {
+  background-color: #f8fafc;
+}
+
+/* ═════════════════ COFFRE-FORT DE DOCUMENTS ═════════════════ */
+.notary-doc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.25rem;
+}
+
+.notary-doc-card {
+  background-color: var(--notary-surface);
+  border: 1px solid var(--notary-border);
+  border-radius: var(--notary-radius);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: var(--notary-shadow);
+}
+
+.notary-doc-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background-color: #fef2f2;
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notary-doc-icon-box.success {
+  background-color: #f0fdf4;
+  color: #10b981;
+}
+
+/* ═════════════════ MESSAGERIE (CHAT) ═════════════════ */
+.notary-chat-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  height: calc(100vh - 180px);
+  background-color: var(--notary-surface);
+  border: 1px solid var(--notary-border);
+  border-radius: var(--notary-radius);
+  overflow: hidden;
+  box-shadow: var(--notary-shadow);
+}
+
+.notary-chat-sidebar {
+  border-right: 1px solid var(--notary-border);
+  background-color: #fafbfc;
+  display: flex;
+  flex-direction: column;
+}
+
+.notary-chat-contact-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.notary-chat-contact-row:hover {
+  background-color: #f1f5f9;
+}
+
+.notary-chat-contact-row.active {
+  background-color: #e2f2ec;
+  border-left: 4px solid var(--notary-primary);
+}
+
+.notary-chat-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: var(--notary-primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+
+.notary-chat-messages {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  background-color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.notary-chat-bubble-wrapper {
+  display: flex;
+  flex-direction: column;
+  max-width: 70%;
+  width: fit-content;
+}
+
+.notary-chat-bubble-wrapper.user {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.notary-chat-bubble-wrapper.other {
+  align-self: flex-start;
+  align-items: flex-start;
+}
+
+.notary-chat-bubble-text {
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.notary-chat-bubble-wrapper.user .notary-chat-bubble-text {
+  background-color: var(--notary-primary);
+  color: white;
+  border-bottom-right-radius: 2px;
+}
+
+.notary-chat-bubble-wrapper.other .notary-chat-bubble-text {
+  background-color: #ffffff;
+  color: var(--notary-text);
+  border-bottom-left-radius: 2px;
+  border: 1px solid var(--notary-border);
+}
+
+/* ═════════════════ MODALE DU CERTIFICAT DE VENTE (A4 AVEC QR CODE) ═════════════════ */
+.notary-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 1.5rem;
+}
+
+.notary-modal-box {
+  background-color: #ffffff;
+  border-radius: var(--notary-radius);
+  width: 100%;
+  max-width: 680px;
+  padding: 2rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+  border: 1px solid #cbd5e1;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Mise en page officielle type papier à en-tête */
+.official-deed-paper {
+  border: 2px solid var(--notary-primary-dark);
+  padding: 2.5rem;
+  background-color: #fffdf9; /* Légèrement ivoire */
+  color: #1a202c;
+  font-family: 'Georgia', serif;
+  line-height: 1.6;
+  position: relative;
+  box-shadow: inset 0 0 40px rgba(13, 94, 69, 0.03);
+}
+
+.official-deed-header {
+  text-align: center;
+  border-bottom: 2px double var(--notary-primary);
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.official-deed-header h2 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin: 0 0 0.25rem;
+}
+
+.official-deed-title {
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--notary-primary-dark);
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.05em;
+}
+
+/* Style du QR Code intégré */
+.deed-qr-code-box {
+  border: 1.5px solid #000;
+  background-color: white;
+  padding: 0.4rem;
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .official-deed-paper, .official-deed-paper * {
+    visibility: visible;
+  }
+  .official-deed-paper {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    border: none;
+  }
+}
