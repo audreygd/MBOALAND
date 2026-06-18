@@ -22,15 +22,15 @@ export default function StatCard({
 }: StatCardProps) {
   return (
     <Paper
-      elevation={2}
+      elevation={1}
       sx={{
         p: 3,
-        borderRadius: 3,
+        borderRadius: 1,
         border: "1px solid #e2e8f0",
         background: "linear-gradient(180deg, #ffffff, #f8fafc)",
-        transition: "0.2s",
+        // transition: "0.2s",
         "&:hover": {
-          transform: "translateY(-3px)",
+          // transform: "translateY(-3px)",
           boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
         },
         ...sx,
@@ -39,7 +39,11 @@ export default function StatCard({
       {/* HEADER */}
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         {/* ✅ color="text.secondary" valeur MUI — OK. fontWeight dans sx */}
-        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ fontWeight: 600 }}
+        >
           {title}
         </Typography>
         {icon && <Box sx={{ color: "#64748b" }}>{icon}</Box>}
@@ -51,15 +55,11 @@ export default function StatCard({
       </Typography>
 
       {/* DESCRIPTION */}
-      <Box sx={{ mt: 1 }}>
-        {description}
-      </Box>
+      <Box sx={{ mt: 1 }}>{description}</Box>
 
       {/* TREND */}
       {trend && (
-        <Box sx={{ mt: 1, fontSize: 12, fontWeight: 600, color }}>
-          {trend}
-        </Box>
+        <Box sx={{ mt: 1, fontSize: 12, fontWeight: 600, color }}>{trend}</Box>
       )}
     </Paper>
   );

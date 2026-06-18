@@ -23,6 +23,7 @@ import {
   // UserIcon,
   SettingsIcon,
   LogoutIcon,
+  VisitIcon,
 } from "../assets/icons";
 
 const menuItems = [
@@ -41,6 +42,10 @@ const menuItems = [
   {
     title: "Transactions",
     icon: <TransactionIcon />,
+  },
+  {
+    title: "Visites",
+    icon: <VisitIcon />,
   },
   {
     title: "Documents",
