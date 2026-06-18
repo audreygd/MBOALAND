@@ -133,7 +133,7 @@ body {
 }
 
 /* ==========================================================================
-   TYPES DE TERRAINS (STYLE BOOKING.COM)
+   TYPES DE TERRAINS
    ========================================================================== */
 .category-grid {
   display: grid;
@@ -315,7 +315,7 @@ body {
 }
 
 /* ==========================================================================
-   BOUCLE DE DESTINATIONS EN VOGUE
+   SECTION DE LA BOUCLE DE VILLES
    ========================================================================== */
 .infinite-section {
   margin-top: 4rem;
@@ -784,7 +784,7 @@ body {
   flex: 1;
 }
 
-/* ═════════════════ NOUVELLE GRILLE 2X2 LATÉRALE POUR LES STATISTIQUES ═════════════════ */
+/* ═════════════════ GRILLE STATS COMPACTE 2X2 ═════════════════ */
 .db-stats-grid-2x2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1065,6 +1065,267 @@ body {
   padding: 2rem;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
   border: 1px solid #cbd5e1;
+}
+
+/* ==========================================================================
+   AJOUTÉ : NOUVELLES PAGES INTERACTIVES DU TABLEAU DE BORD (CHAT & DOCUMENTS)
+   ========================================================================== */
+
+/* 1. Onglet Messagerie (Chat en direct) */
+.chat-tab-container {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  height: calc(100vh - 120px);
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-subtle);
+}
+
+.chat-sidebar-panel {
+  border-right: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  background-color: #fafbfc;
+}
+
+.chat-sidebar-header {
+  padding: 1.25rem 1rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.chat-sidebar-header h3 {
+  font-size: 1rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.chat-contacts-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.chat-contact-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.chat-contact-row:hover {
+  background-color: #f1f5f9;
+}
+
+.chat-contact-row.active {
+  background-color: #e2f2ec;
+  border-left: 4px solid var(--color-primary);
+}
+
+.chat-contact-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: #0d5e45;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+
+.chat-contact-info {
+  flex: 1;
+}
+
+.chat-contact-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.chat-contact-preview {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 0.15rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Fenêtre de discussion */
+.chat-window-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.chat-window-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: #ffffff;
+}
+
+.chat-active-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.chat-active-status {
+  font-size: 0.75rem;
+  color: #10b981;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.15rem;
+}
+
+.chat-active-status::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #10b981;
+  display: inline-block;
+}
+
+.chat-messages-container {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  background-color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Bulles de chat */
+.chat-bubble-wrapper {
+  display: flex;
+  flex-direction: column;
+  max-width: 70%;
+  width: fit-content;
+}
+
+.chat-bubble-wrapper.user {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.chat-bubble-wrapper.other {
+  align-self: flex-start;
+  align-items: flex-start;
+}
+
+.chat-bubble-text {
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.chat-bubble-wrapper.user .chat-bubble-text {
+  background-color: var(--color-primary);
+  color: white;
+  border-bottom-right-radius: 2px;
+}
+
+.chat-bubble-wrapper.other .chat-bubble-text {
+  background-color: #ffffff;
+  color: #1e293b;
+  border-bottom-left-radius: 2px;
+  border: 1px solid #e2e8f0;
+}
+
+.chat-bubble-time {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  margin-top: 0.25rem;
+}
+
+/* Barre d'envoi de messages */
+.chat-input-bar {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  gap: 0.75rem;
+  background-color: #ffffff;
+}
+
+.chat-text-input {
+  flex: 1;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+  font-size: 0.88rem;
+  outline: none;
+}
+
+.chat-text-input:focus {
+  border-color: var(--color-primary);
+}
+
+/* 2. Onglet Documents (Coffre-fort sécurisé) */
+.doc-tab-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.doc-vault-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: transform 0.15s;
+}
+
+.doc-vault-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.04);
+}
+
+.doc-vault-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background-color: #fef2f2;
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.doc-vault-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.doc-vault-meta {
+  font-size: 0.72rem;
+  color: #64748b;
+  margin-top: 0.15rem;
 }
 
 /* ==========================================================================

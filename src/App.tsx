@@ -3,6 +3,7 @@ import VendeurApp from "../apps/vendeur/src/App";
 import GeometreApp from "../apps/geometre/src/App";
 import RoleSelectionPage from "./auth/SelectRole";
 import AcheteurApp from "../apps/acheteur/src/App";
+import { MissionsProvider } from "../apps/geometre/src/context/MissionsContext";
 
 // function SellerPage() {
 //   return <h1>Espace Vendeur</h1>;
