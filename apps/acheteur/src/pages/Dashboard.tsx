@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   Building2, ShieldCheck, Mail, Bell, Search, Filter, 
   Download, Check, Compass, CreditCard, UploadCloud, X, Clock,
-  FileText, MessageSquare, Send, Sparkles, LayoutDashboard
+  FileText, MessageSquare, Send, Sparkles, LayoutDashboard, LogOut
 } from 'lucide-react';
 import { type Terrain } from './Home';
 import './pages.css';
@@ -11,6 +11,7 @@ interface DashboardProps {
   terrain: Terrain;
   notaryName: string;
   onRestart: () => void;
+  onLogout?: () => void; // Nouvelle fonction de déconnexion
 }
 
 interface Transaction {
@@ -35,7 +36,7 @@ interface Message {
   time: string;
 }
 
-export default function Dashboard({ terrain, notaryName, onRestart }: DashboardProps) {
+export default function Dashboard({ terrain, notaryName, onRestart, onLogout }: DashboardProps) {
   // Onglet actif : 'overview' (Tableau de bord) | 'transactions' | 'offers' | 'documents' | 'chat'
   const [activeTab, setActiveTab] = useState<'overview' | 'transactions' | 'offers' | 'documents' | 'chat'>('overview');
 
@@ -197,6 +198,17 @@ export default function Dashboard({ terrain, notaryName, onRestart }: DashboardP
     setPaymentModalOpen(false);
   };
 
+  // Fonction pour déclencher la déconnexion
+  const handleLogoutClick = () => {
+    if (window.confirm("Voulez-vous vraiment vous déconnecter de votre session ?")) {
+      if (onLogout) {
+        onLogout();
+      } else {
+        onRestart(); // Solution de repli si onLogout n'est pas passé
+      }
+    }
+  };
+
   return (
     <div className="db-layout">
       
@@ -243,7 +255,7 @@ export default function Dashboard({ terrain, notaryName, onRestart }: DashboardP
             </li>
           </ul>
         </nav>
-
+{/* 
         <div className="db-help-card-sidebar">
           <h5 style={{ fontWeight: 700, margin: '0 0 0.25rem' }}>Aide MBOALAND</h5>
           <p style={{ fontSize: '0.72rem', color: 'var(--color-text-light)', margin: '0 0 0.75rem', lineHeight: 1.4 }}>
@@ -252,7 +264,21 @@ export default function Dashboard({ terrain, notaryName, onRestart }: DashboardP
           <button className="btn btn-airbnb btn-airbnb-buy" style={{ fontSize: '0.75rem', padding: '0.45rem' }}>
             Contacter le support
           </button>
-        </div>
+        </div> */}
+
+        {/* NOUVEAU BOUTON DE DÉCONNEXION EN BAS DE LA BARRE LATÉRALE */}
+        <button 
+          onClick={handleLogoutClick}
+          className="btn"
+          style={{ 
+            marginTop: '1rem', backgroundColor: '#fef2f2', color: '#dc2626', 
+            border: '1px solid #fecaca', display: 'flex', alignItems: 'center', 
+            justifyContent: 'center', gap: '0.5rem', padding: '0.75rem', 
+            borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer', transition: 'all 0.2s' 
+          }}
+        >
+          <LogOut className="w-4 h-4" /> Déconnexion
+        </button>
       </aside>
 
       {/* 2. ZONE PRINCIPALE DE CONTENU */}
@@ -291,12 +317,22 @@ export default function Dashboard({ terrain, notaryName, onRestart }: DashboardP
             </div>
             <Mail className="w-5 h-5 text-slate-500" style={{ cursor: 'pointer' }} onClick={() => setActiveTab('chat')} />
             <div style={{ height: '24px', width: '1px', backgroundColor: '#e2e8f0', margin: '0 0.25rem' }} />
+            
             <span style={{ fontSize: '0.82rem', fontWeight: 700 }}>Jean Dupont</span>
             <img 
               src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" 
               alt="Avatar" 
               className="db-user-avatar" 
             />
+
+           {/* NOUVELLE ICÔNE DE DÉCONNEXION EN HAUT À DROITE */}
+            <span 
+              title="Se déconnecter" 
+              onClick={handleLogoutClick} 
+              style={{ cursor: 'pointer', marginLeft: '0.5rem', display: 'flex', alignItems: 'center' }}
+            >
+              <LogOut className="w-5 h-5 text-rose-500" />
+            </span>
           </div>
         </header>
 
@@ -519,7 +555,7 @@ export default function Dashboard({ terrain, notaryName, onRestart }: DashboardP
                   </div>
 
                   {activeTx.status === 'progress' && (
-                    <button onClick={() => setPaymentModalOpen(true)} className="btn btn-airbnb btn-airbnb-buy" style={{ width: '100%', padding: '0.8rem', marginTop: '1rem', borderRadius: '10px' }}>
+                    <button onClick={() => setPaymentModalOpen(true)} className="btn btn-airbnb btn-airbnb-buy animate-pulse" style={{ width: '100%', padding: '0.8rem', marginTop: '1rem', borderRadius: '10px' }}>
                       <CreditCard className="w-4 h-4" /> Effectuer le paiement séquestre
                     </button>
                   )}

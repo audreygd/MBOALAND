@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { 
   Building2, ShieldCheck, Mail, Bell, Search, Filter, 
   Download, Check, Clock, X, MessageSquare, FileText, 
-  Send, QrCode, Printer, CheckCircle, FileCheck, CreditCard
+  Send, QrCode, Printer, CheckCircle, FileCheck, CreditCard,
+  AlertTriangle, ShieldAlert
 } from 'lucide-react';
 import './NotaireDashboard.css';
 
-// Interface typée d'une affaire/mission notariale
+// Interface typée d'une affaire/mission notariale [1]
 interface Dossier {
   id: string;
   refCode: string;
@@ -22,6 +23,8 @@ interface Dossier {
   statusLabel: string;
   dateInput: string;
   hasProof: boolean;
+  rejectionReason?: string; // AJOUTÉ : Justification légale du rejet [1]
+  rejectedDate?: string;     // AJOUTÉ : Date effective de l'annulation [1]
 }
 
 // Interface pour le chat de la messagerie
@@ -32,8 +35,8 @@ interface ChatMessage {
 }
 
 export default function NotaireDashboard() {
-  // Navigation principale : 'overview' (Missions) | 'chat' | 'documents' | 'certificates'
-  const [activeTab, setActiveTab] = useState<'overview' | 'chat' | 'documents' | 'certificates'>('overview');
+  // Navigation incluant le nouvel onglet d'historique de rejets [1]
+  const [activeTab, setActiveTab] = useState<'overview' | 'chat' | 'documents' | 'certificates' | 'disputes'>('overview');
   
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [stepFilter, setStepFilter] = useState<string>('all');
@@ -43,7 +46,12 @@ export default function NotaireDashboard() {
   const [certificateModalOpen, setCertificateModalOpen] = useState<boolean>(false);
   const [certificateGenerated, setCertificateGenerated] = useState<boolean>(false);
 
-  // Base des dossiers du cabinet notariale
+  // Modale pour motiver juridiquement le rejet d'un dossier [1]
+  const [rejectModalOpen, setRejectModalOpen] = useState<boolean>(false);
+  const [rejectionReason, setRejectionReason] = useState<string>('');
+  const [targetRejectId, setTargetRejectId] = useState<string | null>(null);
+
+  // Base des dossiers du cabinet notariale (Avec un cas historique simulé de rejet) [1]
   const [dossiers, setDossiers] = useState<Dossier[]>([
     {
       id: 'DOS-2024-0015',
@@ -56,7 +64,7 @@ export default function NotaireDashboard() {
       landTitle: 'TF-1532/CM/CEN',
       amount: '15 230 000 FCFA',
       gps: '3.8842° N, 11.5243° E',
-      step: 3, // Étape 3 : Vérification de l'acte par le notaire
+      step: 3, 
       statusLabel: 'Analyse d\'authenticité',
       dateInput: '12 Mai 2024',
       hasProof: false
@@ -72,10 +80,10 @@ export default function NotaireDashboard() {
       landTitle: 'TF-0987/CM/CEN',
       amount: '22 120 000 FCFA',
       gps: '2.9372° N, 9.9079° E',
-      step: 4, // Étape 4 : Paiement séquestre (Preuve téléversée)
+      step: 4, 
       statusLabel: 'Paiement à valider',
       dateInput: '08 Mai 2024',
-      hasProof: true // Possède une preuve à valider !
+      hasProof: true 
     },
     {
       id: 'DOS-2024-0012',
@@ -88,27 +96,44 @@ export default function NotaireDashboard() {
       landTitle: 'TF-0341/CM/LIT',
       amount: '18 150 000 FCFA',
       gps: '4.0321° N, 9.6912° E',
-      step: 5, // Étape 5 : Prêt pour la signature de vente
+      step: 5, 
       statusLabel: 'Prêt pour signature',
       dateInput: '02 Mai 2024',
       hasProof: true
+    },
+    /* AJOUTÉ : CAS HISTORIQUE DE REJET AVEC MOTIF DU NOTAIRE [1] */
+    {
+      id: 'DOS-2024-0008',
+      refCode: 'TER-2024-0002',
+      buyerName: 'Lucie Mefire',
+      buyerPhone: '+237 672 33 22 11',
+      terrainName: 'Parcelle d\'angle de Bonamoussadi',
+      city: 'Bonamoussadi, Douala · Littoral',
+      area: '450 m²',
+      landTitle: 'TF-0341/CM/LIT',
+      amount: '18 150 000 FCFA',
+      gps: '4.0511° N, 9.7679° E',
+      step: 3,
+      statusLabel: 'Rejeté (Litige / Non-conforme)',
+      dateInput: '28 Avr. 2024',
+      hasProof: false,
+      rejectionReason: 'Double vente détectée sur le cadastre d\'État. Un compromis de vente antérieur est toujours en cours d\'enregistrement pour cette même parcelle [1].',
+      rejectedDate: '30 Avr. 2024'
     }
   ]);
 
-  // Messagerie : Chat avec l'acheteur Jean Dupont
+  // Messagerie : Chat
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-    { sender: 'buyer', text: "Bonjour Maître, j'ai désigné votre cabinet pour mon dossier d'achat à Odza. Pouvez-vous vérifier l'authenticité de mon titre foncier ?", time: 'Aujourd\'hui · 14:10' }
+    { sender: 'buyer', text: "Bonjour Maître, j'ai désigné votre cabinet pour mon dossier d'achat à Odza. Pouvez-vous vérifier l'authenticité de mon titre foncier ?", time: '14:10' }
   ]);
   const [writtenMessage, setWrittenMessage] = useState<string>('');
 
   const handleSendMessage = () => {
     if (!writtenMessage.trim()) return;
-
     const notaryMsg: ChatMessage = { sender: 'notary', text: writtenMessage, time: 'À l\'instant' };
     setChatMessages(prev => [...prev, notaryMsg]);
     setWrittenMessage('');
 
-    // Simulation de réponse de l'acheteur Jean Dupont sous 1,5 seconde
     setTimeout(() => {
       setChatMessages(prev => [
         ...prev,
@@ -119,8 +144,10 @@ export default function NotaireDashboard() {
 
   const activeDossier = dossiers.find(d => d.id === selectedDossierId) || dossiers[0];
 
-  // Filtrage des affaires
+  // Filtrage des affaires actives (Exclut les dossiers rejetés pour garder l'onglet Overview propre) [1]
   const filteredDossiers = dossiers.filter(d => {
+    if (d.statusLabel.includes('Rejeté')) return false; // N'affiche pas les rejets ici [1]
+
     const query = searchQuery.toLowerCase();
     const matchesSearch = 
       d.id.toLowerCase().includes(query) ||
@@ -132,13 +159,16 @@ export default function NotaireDashboard() {
     return matchesSearch && matchesStep;
   });
 
-  // Actions Notaire sur les étapes du dossier
+  // Filtrage exclusif des dossiers rejetés [1]
+  const rejectedDossiersHistory = dossiers.filter(d => d.statusLabel.includes('Rejeté'));
+
+  // Validation cadastrale conforme
   const handleApproveDeed = (dossierId: string) => {
     setDossiers(prev => prev.map(d => {
       if (d.id === dossierId) {
         return {
           ...d,
-          step: 4, // Passe à l'étape 4 (Paiement)
+          step: 4,
           statusLabel: 'En attente paiement séquestre'
         };
       }
@@ -146,12 +176,43 @@ export default function NotaireDashboard() {
     }));
   };
 
+  // AJOUTÉ : OUVERTURE DE LA MODALE DE SAISIE DE MOTIF DE REJET [1]
+  const handleOpenRejectModal = (dossierId: string) => {
+    setTargetRejectId(dossierId);
+    setRejectionReason('');
+    setRejectModalOpen(true);
+  };
+
+  // ENREGISTREMENT ET VALIDATION DU REJET MOTIVÉ [1]
+  const handleConfirmRejection = () => {
+    if (!rejectionReason.trim()) {
+      alert("Veuillez saisir un motif juridique pour formaliser le rejet.");
+      return;
+    }
+
+    setDossiers(prev => prev.map(d => {
+      if (d.id === targetRejectId) {
+        return {
+          ...d,
+          statusLabel: 'Rejeté (Litige / Non-conforme)',
+          rejectionReason: rejectionReason, /* Stockage du motif [1] */
+          rejectedDate: new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
+        };
+      }
+      return d;
+    }));
+
+    setRejectModalOpen(false);
+    setTargetRejectId(null);
+    setRejectionReason('');
+  };
+
   const handleApprovePayment = (dossierId: string) => {
     setDossiers(prev => prev.map(d => {
       if (d.id === dossierId) {
         return {
           ...d,
-          step: 5, // Passe à l'étape 5 (Signature compromise / vente validée)
+          step: 5,
           statusLabel: 'Prêt pour signature'
         };
       }
@@ -159,7 +220,6 @@ export default function NotaireDashboard() {
     }));
   };
 
-  // Impression de l'acte officiel
   const handlePrintDeed = () => {
     window.print();
   };
@@ -184,6 +244,18 @@ export default function NotaireDashboard() {
             >
               <Building2 className="w-4 h-4" /> Dossiers &amp; Missions
             </li>
+            
+            {/* NOUVEL ONGLET : HISTORIQUE DES REJETS / LITIGES FONCIERS [1] */}
+            <li 
+              className={`notary-menu-item ${activeTab === 'disputes' ? 'active' : ''}`}
+              onClick={() => {
+                setActiveTab('disputes');
+                setSelectedDossierId('DOS-2024-0008'); // Pré-sélection du cas historique
+              }}
+            >
+              <ShieldAlert className="w-4 h-4" /> Historique Rejets [1]
+            </li>
+
             <li 
               className={`notary-menu-item ${activeTab === 'chat' ? 'active' : ''}`}
               onClick={() => setActiveTab('chat')}
@@ -216,7 +288,7 @@ export default function NotaireDashboard() {
       {/* 2. ZONE PRINCIPALE DE TRAVAIL */}
       <main className="notary-main-content">
         
-        {/* Entête supérieur de la page */}
+        {/* Entête supérieur */}
         <header className="notary-top-header">
           <div>
             <h1 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0 }}>Étude de Me Mireille Dubois</h1>
@@ -243,11 +315,79 @@ export default function NotaireDashboard() {
           {/* ================= Onglet 1 : GESTION DES DOSSIERS / MISSIONS ================= */}
           {activeTab === 'overview' && (
             <div>
-              {/* Ligne des statistiques du Notaire */}
+              {/* Graphes et jauges */}
+              <div className="notary-chart-card">
+                <div className="notary-chart-header">
+                  <div>
+                    <h3 className="notary-chart-title">Rendement de l'Étude</h3>
+                    <span className="notary-chart-subtitle">Actes officiels certifiés sur 7 jours</span>
+                  </div>
+                  <span style={{ color: '#10b981', fontWeight: 700, fontSize: '0.9rem' }}>+12% d'actes signés</span>
+                </div>
+
+                <div style={{ width: '100%', height: '180px', position: 'relative' }}>
+                  <svg viewBox="0 0 700 180" width="100%" height="100%" style={{ overflow: 'visible' }}>
+                    <defs>
+                      <linearGradient id="notaryChartGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#0d5e45" stopOpacity="0.25" />
+                        <stop offset="100%" stopColor="#0d5e45" stopOpacity="0.00" />
+                      </linearGradient>
+                    </defs>
+                    <line x1="40" y1="160" x2="660" y2="160" stroke="#f1f5f9" strokeWidth={1} />
+                    <line x1="40" y1="115" x2="660" y2="115" stroke="#f1f5f9" strokeWidth={1} />
+                    <line x1="40" y1="60" x2="660" y2="60" stroke="#f1f5f9" strokeWidth={1} />
+                    <line x1="40" y1="20" x2="660" y2="20" stroke="#f1f5f9" strokeWidth={1} />
+                    <text x="15" y="164" fill="#94a3b8" fontSize="11" fontFamily="sans-serif">0</text>
+                    <text x="15" y="119" fill="#94a3b8" fontSize="11" fontFamily="sans-serif">2</text>
+                    <text x="15" y="64" fill="#94a3b8" fontSize="11" fontFamily="sans-serif">5</text>
+                    <text x="15" y="24" fill="#94a3b8" fontSize="11" fontFamily="sans-serif">7</text>
+                    <path d="M 60,115 L 160,64 L 260,116 L 360,60 L 460,30 L 560,94 L 660,20 L 660,160 L 60,160 Z" fill="url(#notaryChartGradient)" />
+                    <path d="M 60,115 L 160,64 L 260,116 L 360,60 L 460,30 L 560,94 L 660,20" fill="none" stroke="#0d5e45" strokeWidth={3} strokeLinecap="round" />
+                    <circle cx="60" cy="115" r="6" fill="#0d5e45" stroke="#ffffff" strokeWidth={2} />
+                    <circle cx="160" cy="64" r="6" fill="#0d5e45" stroke="#ffffff" strokeWidth={2} />
+                    <circle cx="260" cy="116" r="6" fill="#0d5e45" stroke="#ffffff" strokeWidth={2} />
+                    <circle cx="360" cy="60" r="6" fill="#0d5e45" stroke="#ffffff" strokeWidth={2} />
+                    <circle cx="460" cy="30" r="6" fill="#0d5e45" stroke="#ffffff" strokeWidth={2} />
+                    <circle cx="560" cy="94" r="6" fill="#0d5e45" stroke="#ffffff" strokeWidth={2} />
+                    <circle cx="660" cy="20" r="6" fill="#0d5e45" stroke="#ffffff" strokeWidth={2} />
+                    <text x="52" y="178" fill="#94a3b8" fontSize="11" fontFamily="sans-serif">J1</text>
+                    <text x="152" y="178" fill="#94a3b8" fontSize="11" fontFamily="sans-serif">J2</text>
+                    <text x="252" y="178" fill="#94a3b8" fontSize="11" fontFamily="sans-serif">J3</text>
+                    <text x="352" y="178" fill="#94a3b8" fontSize="11" fontFamily="sans-serif">J4</text>
+                    <text x="452" y="178" fill="#94a3b8" fontSize="11" fontFamily="sans-serif">J5</text>
+                    <text x="552" y="178" fill="#94a3b8" fontSize="11" fontFamily="sans-serif">J6</text>
+                    <text x="652" y="178" fill="#94a3b8" fontSize="11" fontFamily="sans-serif">J7</text>
+                  </svg>
+                </div>
+
+                <div style={{ display: 'flex', gap: '2rem', marginTop: '1.5rem', borderTop: '1px solid var(--notary-border)', paddingTop: '1.5rem', flexWrap: 'wrap' }}>
+                  <div style={{ flex: 1, minWidth: '240px' }}>
+                    <div className="progress-row-label">
+                      <span>Dossiers approuvés (Conformes)</span>
+                      <span style={{ color: 'var(--notary-primary)' }}>85%</span>
+                    </div>
+                    <div className="progress-bar-bg" style={{ marginBottom: 0 }}>
+                      <div className="progress-bar-fill" style={{ width: '85%' }} />
+                    </div>
+                  </div>
+
+                  <div style={{ flex: 1, minWidth: '240px' }}>
+                    <div className="progress-row-label">
+                      <span>Dossiers rejetés (Litiges identifiés)</span>
+                      <span style={{ color: 'var(--notary-danger)' }}>15%</span>
+                    </div>
+                    <div className="progress-bar-bg" style={{ marginBottom: 0 }}>
+                      <div className="progress-bar-fill red" style={{ width: '15%' }} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Ligne des statistiques */}
               <div className="notary-stats-grid">
                 <div className="notary-stat-card">
                   <div className="notary-stat-icon-wrapper blue"><Clock className="w-5 h-5" /></div>
-                  <div><div className="notary-stat-value">{dossiers.filter(d => d.step === 3).length}</div><div className="notary-stat-label">À authentifier</div></div>
+                  <div><div className="notary-stat-value">{dossiers.filter(d => d.step === 3 && !d.statusLabel.includes('Rejeté')).length}</div><div className="notary-stat-label">À authentifier</div></div>
                 </div>
                 <div className="notary-stat-card">
                   <div className="notary-stat-icon-wrapper amber"><CreditCard className="w-5 h-5" /></div>
@@ -259,14 +399,13 @@ export default function NotaireDashboard() {
                 </div>
                 <div className="notary-stat-card">
                   <div className="notary-stat-icon-wrapper rose"><ShieldCheck className="w-5 h-5" /></div>
-                  <div><div className="notary-stat-value">{dossiers.length}</div><div className="notary-stat-label">Affaires totales</div></div>
+                  <div><div className="notary-stat-value">{dossiers.filter(d => !d.statusLabel.includes('Rejeté')).length}</div><div className="notary-stat-label">Affaires actives</div></div>
                 </div>
               </div>
 
-              {/* Contenu principal : Table des affaires à gauche, Tiroir d'action à droite */}
+              {/* Contenu principal : Table des affaires + Action à droite */}
               <div className="notary-grid-content">
                 
-                {/* Table des Affaires */}
                 <div className="notary-card-box">
                   <div className="notary-filters-bar">
                     <input 
@@ -276,11 +415,7 @@ export default function NotaireDashboard() {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                     />
-                    <select 
-                      className="notary-select"
-                      value={stepFilter}
-                      onChange={(e) => setStepFilter(e.target.value)}
-                    >
+                    <select className="notary-select" value={stepFilter} onChange={(e) => setStepFilter(e.target.value)}>
                       <option value="all">Toutes les étapes</option>
                       <option value="3">Vérification de titre</option>
                       <option value="4">Attente de versement</option>
@@ -320,24 +455,24 @@ export default function NotaireDashboard() {
                             </td>
                             <td><strong>{d.amount}</strong></td>
                             <td>
-                              {d.step === 3 && <span className="notary-badge pending">Authentification</span>}
-                              {d.step === 4 && <span className="notary-badge pending" style={{ backgroundColor: '#fffbeb', color: '#f59e0b' }}>À payer</span>}
-                              {d.step === 5 && <span className="notary-badge success">Prêt à signer</span>}
+                              {d.step === 3 ? (
+                                <span className="notary-badge pending">Authentification</span>
+                              ) : d.step === 4 ? (
+                                <span className="notary-badge pending" style={{ backgroundColor: '#fffbeb', color: '#f59e0b' }}>À payer</span>
+                              ) : (
+                                <span className="notary-badge success">Prêt à signer</span>
+                              )}
                             </td>
                           </tr>
                         ))
                       ) : (
-                        <tr>
-                          <td colSpan={5} style={{ textAlign: 'center', color: '#64748b', padding: '2rem' }}>
-                            Aucun dossier en cours pour ces filtres.
-                          </td>
-                        </tr>
+                        <tr><td colSpan={5} style={{ textAlign: 'center', color: '#64748b', padding: '2rem' }}>Aucun dossier en cours.</td></tr>
                       )}
                     </tbody>
                   </table>
                 </div>
 
-                {/* Tiroir d'action du Notaire (Droit) */}
+                {/* Tiroir d'action */}
                 <div className="notary-drawer">
                   <div className="notary-drawer-header">
                     <h3 style={{ fontSize: '0.9rem', fontWeight: 800, margin: 0 }}>Action administrative</h3>
@@ -352,71 +487,110 @@ export default function NotaireDashboard() {
                     <div>Étape actuelle : <strong style={{ color: 'var(--notary-primary)' }}>Étape {activeDossier.step} / 5</strong></div>
                   </div>
 
-                  {/* BOUTON D'ACTION 1 : APPROUVER L'AUTHENTICITÉ DU TITRE */}
                   {activeDossier.step === 3 && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                       <p style={{ fontSize: '0.75rem', color: 'var(--notary-text-light)', lineHeight: 1.4, margin: 0 }}>
-                        Vérifiez le titre cadastral fourni. Cliquer sur approuver notifiera l'acheteur pour qu'il effectue le paiement séquestre.
+                        Vérifiez le titre cadastral fourni. Vous pouvez valider l'affaire ou rejeter le dossier en cas de litige foncier [1].
                       </p>
-                      <button 
-                        onClick={() => handleApproveDeed(activeDossier.id)}
-                        className="btn-notary btn-notary-primary"
-                      >
-                        <FileCheck className="w-4 h-4" /> Approuver l'authenticité du Titre
-                      </button>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button onClick={() => handleApproveDeed(activeDossier.id)} className="btn-notary btn-notary-primary" style={{ flex: 1 }}>
+                          <FileCheck className="w-4 h-4" /> Approuver
+                        </button>
+                        <button onClick={() => handleOpenRejectModal(activeDossier.id)} className="btn-notary btn-notary-danger" style={{ flex: 1 }}>
+                          <AlertTriangle className="w-4 h-4" /> Refuser (Litige)
+                        </button>
+                      </div>
                     </div>
                   )}
 
-                  {/* BOUTON D'ACTION 2 : VALIDER LA PREUVE DE PAIEMENT SÉQUESTRE */}
                   {activeDossier.step === 4 && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                       <p style={{ fontSize: '0.75rem', color: 'var(--notary-text-light)', lineHeight: 1.4, margin: 0 }}>
-                        {activeDossier.hasProof 
-                          ? 'Une preuve de versement d\'acompte a été soumise par l\'acheteur. Veuillez vérifier votre solde de séquestre.'
-                          : 'L\'acheteur n\'a pas encore versé les fonds sur le compte de l\'étude notariale.'}
+                        {activeDossier.hasProof ? 'Une preuve de versement d\'acompte a été soumise par l\'acheteur.' : 'L\'acheteur n\'a pas encore versé les fonds sur le compte de l\'étude.'}
                       </p>
                       {activeDossier.hasProof ? (
-                        <button 
-                          onClick={() => handleApprovePayment(activeDossier.id)}
-                          className="btn-notary btn-notary-primary animate-pulse"
-                        >
+                        <button onClick={() => handleApprovePayment(activeDossier.id)} className="btn-notary btn-notary-primary animate-pulse">
                           <CheckCircle className="w-4 h-4" /> Valider le versement séquestre
                         </button>
                       ) : (
-                        <button className="btn-notary btn-notary-outline" style={{ cursor: 'not-allowed', color: '#94a3b8' }} disabled>
-                          En attente du virement
-                        </button>
+                        <button className="btn-notary btn-notary-outline" style={{ cursor: 'not-allowed', color: '#94a3b8' }} disabled>En attente du virement</button>
                       )}
                     </div>
                   )}
 
-                  {/* BOUTON D'ACTION 3 : GÉNÉRATION DU CERTIFICAT DE VENTE ET QR CODE */}
                   {activeDossier.step === 5 && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                       <p style={{ fontSize: '0.75rem', color: 'var(--notary-text-light)', lineHeight: 1.4, margin: 0 }}>
                         L'authenticité et le paiement séquestre ont été validés. Vous pouvez générer l'acte de vente officiel avec signature et QR Code de certification.
                       </p>
-                      <button 
-                        onClick={() => {
-                          setCertificateGenerated(false);
-                          setCertificateModalOpen(true);
-                        }}
-                        className="btn-notary btn-notary-primary"
-                      >
+                      <button onClick={() => { setCertificateGenerated(false); setCertificateModalOpen(true); }} className="btn-notary btn-notary-primary">
                         <QrCode className="w-4 h-4" /> Produire l'Acte de Vente (QR Code)
                       </button>
                     </div>
                   )}
                 </div>
-
               </div>
             </div>
           )}
 
-          {/* ================= Onglet 2 : MESSAGERIE (CHAT NOTAIRE / ACHETEUR) ================= */}
+          {/* ================= NOUVEAU ONGLET : HISTORIQUE DES DOSSIERS REJETÉS / LITIGES [1] ================= */}
+          {activeTab === 'disputes' && (
+            <div className="notary-grid-content">
+              {/* Table des rejets */}
+              <div className="notary-card-box" style={{ margin: 0 }}>
+                <h3 style={{ margin: '0 0 1.25rem', fontSize: '1rem', fontWeight: 800 }}>Dossiers annulés ou suspectés de fraude</h3>
+                <table className="notary-table">
+                  <thead>
+                    <tr><th>Affaire ID</th><th>Acquéreur</th><th>Titre Foncier</th><th>Date d'annulation</th></tr>
+                  </thead>
+                  <tbody>
+                    {rejectedDossiersHistory.map((d) => (
+                      <tr 
+                        key={d.id} 
+                        className={`notary-row-clickable ${selectedDossierId === d.id ? 'active' : ''}`}
+                        onClick={() => setSelectedDossierId(d.id)}
+                      >
+                        <td><strong>{d.id}</strong></td>
+                        <td><strong>{d.buyerName}</strong></td>
+                        <td><code style={{ fontWeight: 'bold' }}>{d.landTitle}</code></td>
+                        <td><span className="notary-badge danger" style={{ fontSize: '0.7rem' }}>{d.rejectedDate || 'Récemment'}</span></td>
+                      </tr>
+                    ))}
+                    {rejectedDossiersHistory.length === 0 && (
+                      <tr><td colSpan={4} style={{ textAlign: 'center', padding: '2rem' }}>Aucun litige recensé dans l'historique de l'étude.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Volet droit : Motif légal du rejet */}
+                {activeDossier && activeDossier.statusLabel.includes('Rejeté') && (
+                <div className="notary-drawer">
+                  <div className="notary-drawer-header">
+                    <h3 style={{ fontSize: '0.9rem', fontWeight: 800, margin: 0 }}>Dossier litigieux</h3>
+                    <span className="notary-badge danger" style={{ fontSize: '0.68rem' }}>BLOQUÉ</span>
+                  </div>
+
+                  <div style={{ fontSize: '0.8rem', display: 'flex', flexDirection: 'column', gap: '0.6rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '1rem', marginBottom: '1.25rem' }}>
+                    <div>Acquéreur : <strong>{activeDossier.buyerName}</strong></div>
+                    <div>Titre foncier : <strong>{activeDossier.landTitle}</strong></div>
+                    <div>Localisation : <strong>{activeDossier.city}</strong></div>
+                    <div>Valeur d'acquisition : <strong>{activeDossier.amount}</strong></div>
+                  </div>
+
+                  <h4 style={{ fontSize: '0.8rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--notary-danger)', margin: '0 0 0.5rem' }}>Motif légal du rejet [1]</h4>
+                  <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fca5a5', color: 'var(--notary-danger)', padding: '1rem', borderRadius: '8px', fontSize: '0.8rem', lineHeight: 1.5, fontWeight: 500 }}>
+                    <AlertTriangle className="w-5 h-5" style={{ marginBottom: '0.4rem' }} />
+                    {activeDossier.rejectionReason || 'Aucune explication légale saisie.'}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ================= Onglet 2 : MESSAGERIE ================= */}
           {activeTab === 'chat' && (
             <div className="notary-chat-layout">
-              {/* Sidebar de messagerie */}
               <div className="notary-chat-sidebar">
                 <div style={{ padding: '1rem', borderBottom: '1px solid var(--notary-border)' }}>
                   <h4 style={{ margin: 0, fontSize: '0.9rem' }}>Discussions Actives</h4>
@@ -430,7 +604,6 @@ export default function NotaireDashboard() {
                 </div>
               </div>
 
-              {/* Fenêtre de discussion */}
               <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                 <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--notary-border)', backgroundColor: '#ffffff' }}>
                   <h4 style={{ margin: 0, fontSize: '0.9rem' }}>{activeDossier.buyerName} (Acquéreur)</h4>
@@ -448,16 +621,8 @@ export default function NotaireDashboard() {
                   ))}
                 </div>
 
-                {/* Champ de saisie Notaire */}
                 <div style={{ padding: '1rem 1.5rem', borderTop: '1px solid var(--notary-border)', display: 'flex', gap: '0.75rem', backgroundColor: '#ffffff' }}>
-                  <input 
-                    type="text" 
-                    placeholder="Écrire un message d'étude à l'acquéreur..." 
-                    className="notary-search-input" 
-                    value={writtenMessage}
-                    onChange={(e) => setWrittenMessage(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter') handleSendMessage(); }}
-                  />
+                  <input type="text" placeholder="Écrire un message d'étude à l'acquéreur..." className="notary-search-input" value={writtenMessage} onChange={(e) => setWrittenMessage(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handleSendMessage(); }} />
                   <button className="btn-notary btn-notary-primary" style={{ width: 'auto', padding: '0.65rem 1.5rem' }} onClick={handleSendMessage}>
                     Envoyer <Send className="w-4 h-4" />
                   </button>
@@ -466,7 +631,7 @@ export default function NotaireDashboard() {
             </div>
           )}
 
-          {/* ================= Onglet 3 : GESTION DES DOCUMENTS REÇUS ================= */}
+          {/* ================= Onglet 3 : PIÈCES REÇUES ================= */}
           {activeTab === 'documents' && (
             <div className="notary-doc-grid">
               <div className="notary-doc-card">
@@ -509,7 +674,7 @@ export default function NotaireDashboard() {
           {/* ================= Onglet 4 : CERTIFICATS PRODUITS ET ARCHIVÉS ================= */}
           {activeTab === 'certificates' && (
             <div className="notary-doc-grid">
-              {dossiers.filter(d => d.step === 5).map((d) => (
+              {dossiers.filter(d => d.step === 5 && !d.statusLabel.includes('Rejeté')).map((d) => (
                 <div key={d.id} className="notary-doc-card" style={{ borderColor: 'var(--notary-primary)' }}>
                   <div className="notary-doc-icon-box success"><ShieldCheck className="w-6 h-6" /></div>
                   <div>
@@ -534,7 +699,39 @@ export default function NotaireDashboard() {
         </div>
       </main>
 
-      {/* 3. MODALE D'ÉDITION DE L'ACTE DE VENTE AVEC LE GRAND PORTRAIT ET LE QR CODE */}
+      {/* ═════════════════ MODALE DE SAISIE DU MOTIF DU REJET (NOUVEAU) [1] ═════════════════ */}
+      {rejectModalOpen && (
+        <div className="notary-modal-overlay">
+          <div className="notary-modal-content-box animate-scale-up" style={{ backgroundColor: '#ffffff', borderRadius: '12px', width: '100%', maxWidth: '460px', padding: '1.5rem', border: '1px solid #fca5a5' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.5rem' }}>
+              <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--notary-danger)', display: 'flex', alignItems: 'center', gap: '0.4rem', margin: 0 }}>
+                <AlertTriangle className="w-5 h-5" /> Justifier le rejet du dossier [1]
+              </h3>
+              <X className="w-5 h-5 text-slate-400 cursor-pointer" onClick={() => { setRejectModalOpen(false); setTargetRejectId(null); }} />
+            </div>
+
+            <p style={{ fontSize: '0.8rem', color: 'var(--notary-text-light)', lineHeight: 1.4, marginBottom: '1rem' }}>
+              Veuillez spécifier le motif légal et formel de l'annulation de l'affaire <strong>{targetRejectId}</strong>. L'acquéreur en sera immédiatement notifié pour l'arbitrage d'État [1].
+            </p>
+
+            <textarea 
+              placeholder="Ex : Falsification constatée sur la signature du propriétaire du titre foncier d'origine..." 
+              className="form-group-input" 
+              rows={3} 
+              style={{ width: '100%', resize: 'vertical', fontSize: '0.85rem', padding: '0.65rem' }}
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+            />
+
+            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.25rem', borderTop: '1px solid #e2e8f0', paddingTop: '1rem' }}>
+              <button className="btn-notary btn-notary-outline" style={{ flex: 1 }} onClick={() => { setRejectModalOpen(false); setTargetRejectId(null); }}>Annuler</button>
+              <button className="btn-notary btn-notary-danger" style={{ flex: 1, backgroundColor: 'var(--notary-danger)', color: 'white' }} onClick={handleConfirmRejection}>Confirmer le rejet motivé [1]</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODALE DU CERTIFICAT DE VENTE */}
       {certificateModalOpen && (
         <div className="notary-modal-overlay">
           <div className="notary-modal-box">
@@ -544,7 +741,6 @@ export default function NotaireDashboard() {
               <X className="w-5 h-5 text-slate-400 cursor-pointer" onClick={() => setCertificateModalOpen(false)} />
             </div>
 
-            {/* PAPIER À EN-TÊTE DU CERTIFICAT DE VENTE OFFICIEL */}
             <div className="official-deed-paper" id="printable-deed">
               <div className="official-deed-header">
                 <h2>République du Cameroun</h2>
@@ -570,27 +766,21 @@ export default function NotaireDashboard() {
                 Le versement séquestre de l'acompte ayant été dument validé et consigné en l'étude notariale de Yaoundé, la mutation définitive du titre foncier au registre domanial est déclarée recevable.
               </p>
 
-              {/* Zone inférieure : Signature et QR Code de certification MBOALAND */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '2rem' }}>
                 <div style={{ textAlign: 'center', fontSize: '0.78rem' }}>
                   <p style={{ margin: 0 }}><strong>Sceau et Signature</strong></p>
                   <p style={{ fontStyle: 'italic', margin: '2rem 0 0', textDecoration: 'underline' }}>Me Mireille Dubois</p>
                 </div>
 
-                {/* QR CODE SÉCURISÉ VECTORIEL SANS DÉPENDANCES (100% FONCTIONNEL ET BEAU) */}
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.35rem' }}>
                   <div className="deed-qr-code-box">
                     <svg width="76" height="76" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
-                      {/* Motif de coin supérieur gauche */}
                       <rect x="2" y="2" width="6" height="6" rx="1" />
                       <rect x="4" y="4" width="2" height="2" />
-                      {/* Motif de coin supérieur droit */}
                       <rect x="16" y="2" width="6" height="6" rx="1" />
                       <rect x="18" y="4" width="2" height="2" />
-                      {/* Motif de coin inférieur gauche */}
                       <rect x="2" y="16" width="6" height="6" rx="1" />
                       <rect x="4" y="18" width="2" height="2" />
-                      {/* Matrice de bruit simulée */}
                       <path d="M10 2h2v2h-2zM12 6h2v2h-2zM10 10h4v2h-4zM2 10h2v2H2zM6 12h2v2H6zM10 16h2v2h-2zM14 18h2v2h-2zM18 10h4v2h-4zM20 14h2v2h-2zM16 16h2v2h-2zM10 20h2v2h-2z" fill="#000" />
                     </svg>
                   </div>
@@ -599,7 +789,6 @@ export default function NotaireDashboard() {
               </div>
             </div>
 
-            {/* Barre de boutons de la modale */}
             <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem', borderTop: '1px solid var(--notary-border)', paddingTop: '1.25rem' }}>
               <button className="btn-notary btn-notary-outline" style={{ width: 'auto' }} onClick={() => setCertificateModalOpen(false)}>Fermer</button>
               
