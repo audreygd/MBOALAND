@@ -2,13 +2,14 @@
    VARIABLES NOTAIRE (MBOALAND NOTARY WORKSPACE)
    ========================================================================== */
 :root {
-  --notary-primary: #0a5c44;        /* Vert forêt officiel */
-  --notary-primary-dark: #05332c;   /* Vert canopée profond */
+  --notary-primary: #0d5e45;        /* Vert forêt officiel Mboaland */
+  --notary-primary-dark: #083d2e;   /* Vert canopée profond */
   --notary-bg: #f8fafc;             /* Gris de fond clair */
   --notary-surface: #ffffff;
   --notary-border: #e2e8f0;         /* Bordures fines */
   --notary-text: #1e293b;           /* Gris très foncé */
   --notary-text-light: #64748b;     /* Gris moyen */
+  --notary-danger: #dc2626;         /* Rouge vif pour les rejets et litiges */
   --notary-radius: 12px;
   --notary-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
@@ -120,7 +121,7 @@
   flex: 1;
 }
 
-/* Grille de statistiques 2x2 */
+/* Cartes Stats */
 .notary-stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -148,25 +149,89 @@
   justify-content: center;
 }
 
-.notary-stat-icon-wrapper.blue { background-color: #eff6ff; color: #3b82f6; }
+.notary-stat-icon-wrapper.blue { background-color: #e2f2ec; color: var(--notary-primary); }
 .notary-stat-icon-wrapper.amber { background-color: #fffbeb; color: #f59e0b; }
 .notary-stat-icon-wrapper.green { background-color: #f0fdf4; color: #10b981; }
-.notary-stat-icon-wrapper.rose { background-color: #fef2f2; color: #f43f5e; }
+.notary-stat-icon-wrapper.rose { background-color: #fef2f2; color: var(--notary-danger); }
 
-.notary-stat-value {
-  font-size: 1.5rem;
+.notary-stat-value { font-size: 1.5rem; font-weight: 800; color: #0f172a; }
+.notary-stat-label { font-size: 0.78rem; color: var(--notary-text-light); margin-top: 0.2rem; font-weight: 500; }
+
+/* ==========================================================================
+   GRAPHES ET ANALYSE
+   ========================================================================== */
+.notary-chart-card {
+  background-color: var(--notary-surface);
+  border: 1px solid var(--notary-border);
+  border-radius: 24px; 
+  padding: 2rem;
+  box-shadow: var(--notary-shadow);
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.notary-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.notary-chart-title {
+  font-size: 1.2rem;
   font-weight: 800;
-  color: #0f172a;
+  color: #1e293b;
+  margin: 0;
 }
 
-.notary-stat-label {
-  font-size: 0.78rem;
+.notary-chart-subtitle {
+  font-size: 0.85rem;
   color: var(--notary-text-light);
-  margin-top: 0.2rem;
-  font-weight: 500;
+  margin-top: 0.25rem;
 }
 
-/* Grille de contenu (Tableau de dossiers + Suivi à droite) */
+.notary-progress-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.progress-box {
+  background-color: var(--notary-surface);
+  border: 1px solid var(--notary-border);
+  border-radius: var(--notary-radius);
+  padding: 1.5rem;
+}
+
+.progress-row-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.progress-bar-bg {
+  width: 100%;
+  height: 8px;
+  background-color: #f1f5f9;
+  border-radius: 100px;
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 100px;
+  background-color: var(--notary-primary);
+}
+
+.progress-bar-fill.red {
+  background-color: var(--notary-danger);
+}
+
+/* Grille de contenu */
 .notary-grid-content {
   display: grid;
   grid-template-columns: 1fr 350px;
@@ -267,7 +332,8 @@
 
 .notary-badge.pending { background-color: #fffbeb; color: #b45309; }
 .notary-badge.progress { background-color: #eff6ff; color: #1d4ed8; }
-.notary-badge.success { background-color: #f0fdf4; color: #15803d; }
+.notary-badge.success { background-color: #e2f2ec; color: var(--notary-primary-dark); }
+.notary-badge.danger { background-color: #fef2f2; color: var(--notary-danger); }
 
 /* Tiroir de droite */
 .notary-drawer {
@@ -311,6 +377,19 @@
 
 .btn-notary-primary:hover {
   background-color: var(--notary-primary-dark);
+}
+
+.btn-notary-danger {
+  background-color: #ffffff;
+  color: var(--notary-danger);
+  border-color: #fca5a5;
+  background-color: #fff5f5;
+}
+
+.btn-notary-danger:hover {
+  background-color: var(--notary-danger);
+  color: white;
+  border-color: var(--notary-danger);
 }
 
 .btn-notary-outline {

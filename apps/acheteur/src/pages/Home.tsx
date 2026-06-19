@@ -93,22 +93,29 @@ const INITIAL_TERRAINS: Terrain[] = [
   }
 ];
 
+// Nouveaux paramètres reçus depuis App.tsx
 interface HomeProps {
   onViewDetails: (terrain: Terrain) => void;
   onBuy: (terrain: Terrain) => void;
+  isAuthenticated: boolean;
+  onLoginRequest: () => void;
+  onRegisterRequest: () => void;
+  onPublishRequest: () => void;
+  isPublishModalOpen: boolean;
+  onClosePublishModal: () => void;
 }
 
-export default function Home({ onViewDetails, onBuy }: HomeProps) {
-  // Liste des terrains gérée par un état pour pouvoir en rajouter en temps réel
+export default function Home({ 
+  onViewDetails, onBuy, isAuthenticated, onLoginRequest, onRegisterRequest, 
+  onPublishRequest, isPublishModalOpen, onClosePublishModal 
+}: HomeProps) {
+  
   const [terrains, setTerrains] = useState<Terrain[]>(INITIAL_TERRAINS);
-
-  // États pour les filtres et la recherche
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  // États pour le formulaire de publication de terrain (vendeur)
-  const [publishModalOpen, setPublishModalOpen] = useState<boolean>(false);
+  // États du formulaire de publication
   const [newTitle, setNewTitle] = useState<string>('');
   const [newCity, setNewCity] = useState<string>('');
   const [newArea, setNewArea] = useState<string>('');
@@ -118,7 +125,6 @@ export default function Home({ onViewDetails, onBuy }: HomeProps) {
   const [newDesc, setNewDesc] = useState<string>('');
   const [newType, setNewType] = useState<'residentiel' | 'agricole' | 'commercial' | 'industriel'>('residentiel');
 
-  // FILTRAGE : Un seul input qui vérifie SIMULTANÉMENT : le Nom (title), la Ville (city) et le Titre Foncier (landTitle)
   const filteredTerrains = terrains.filter((t) => {
     const query = searchQuery.toLowerCase();
     const matchesUnifiedSearch = 
@@ -126,31 +132,20 @@ export default function Home({ onViewDetails, onBuy }: HomeProps) {
       t.city.toLowerCase().includes(query) ||
       t.landTitle.toLowerCase().includes(query);
 
-    const matchesCity = 
-      selectedCity === null || 
-      t.region === selectedCity;
-
-    const matchesCategory = 
-      selectedCategory === 'all' || 
-      t.type === selectedCategory;
+    const matchesCity = selectedCity === null || t.region === selectedCity;
+    const matchesCategory = selectedCategory === 'all' || t.type === selectedCategory;
 
     return matchesUnifiedSearch && matchesCity && matchesCategory;
   });
 
-  const cityFilteredTerrains = terrains.filter(
-    (t) => t.region === selectedCity
-  );
+  const cityFilteredTerrains = terrains.filter((t) => t.region === selectedCity);
 
-  // Fonction d'ajout d'une parcelle (vendeur)
   const handlePublishTerrain = (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!newTitle || !newCity || !newPrice || !newLandTitle || !newOwner) {
       alert("Veuillez renseigner tous les champs obligatoires (*) pour publier.");
       return;
     }
-
-    // Association de la ville de saisie à une région clé pour le tri
     const detectRegion = (city: string): 'Yaoundé' | 'Douala' | 'Mbankomo' | 'Bafoussam' => {
       const val = city.toLowerCase();
       if (val.includes('douala')) return 'Douala';
@@ -158,8 +153,6 @@ export default function Home({ onViewDetails, onBuy }: HomeProps) {
       if (val.includes('bafoussam')) return 'Bafoussam';
       return 'Yaoundé';
     };
-
-    // Attribution d'une image réaliste selon la catégorie
     const getCategoryImage = (cat: string) => {
       if (cat === 'agricole') return 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=800&q=80';
       if (cat === 'commercial') return 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80';
@@ -182,24 +175,16 @@ export default function Home({ onViewDetails, onBuy }: HomeProps) {
       owner: newOwner,
       gps: '3.' + Math.floor(1000 + Math.random() * 9000) + '° N, 11.' + Math.floor(1000 + Math.random() * 9000) + '° E',
       desc: newDesc || 'Aucune description additionnelle fournie par le propriétaire.',
-      certified: false, // Nouveau terrain : pas encore certifié
+      certified: false,
       image: getCategoryImage(newType),
       type: newType
     };
 
-    // Insertion au début de la liste
     setTerrains([newTerrain, ...terrains]);
-    setPublishModalOpen(false);
-
-    // Réinitialisation des champs du formulaire
-    setNewTitle('');
-    setNewCity('');
-    setNewArea('');
-    setNewPrice('');
-    setNewLandTitle('');
-    setNewOwner('');
-    setNewDesc('');
-    setNewType('residentiel');
+    onClosePublishModal(); // Fermer la modale gérée par App.tsx
+    
+    setNewTitle(''); setNewCity(''); setNewArea(''); setNewPrice('');
+    setNewLandTitle(''); setNewOwner(''); setNewDesc(''); setNewType('residentiel');
   };
 
   const CITIES_LIST = [
@@ -208,7 +193,6 @@ export default function Home({ onViewDetails, onBuy }: HomeProps) {
     { id: 'Mbankomo', name: 'Mbankomo', flag: '🇨🇲', count: 'Mbankomo rase campagne', image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=400&q=80' },
     { id: 'Bafoussam', name: 'Bafoussam', flag: '🇨🇲', count: 'Ouest plateaux', image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80' },
   ];
-
   const INFINITE_CITIES = [...CITIES_LIST, ...CITIES_LIST, ...CITIES_LIST];
 
   const CATEGORIES = [
@@ -221,9 +205,35 @@ export default function Home({ onViewDetails, onBuy }: HomeProps) {
 
   return (
     <div>
-      <div className="page-container">
+      {/* BARRE DE NAVIGATION */}
+      <header className="top-nav-bar">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--color-primary)' }}>MBOA<span style={{ color: '#0f172a' }}>LAND</span></span>
+        </div>
         
-        {/* ═════════════════ MOTEUR DE RECHERCHE & PUBLICATION ═════════════════ */}
+        <div className="nav-links">
+          <a href="#about" className="nav-link">À propos de nous</a>
+          <a href="#support" className="nav-link">Aide & Support</a>
+          
+          {!isAuthenticated ? (
+            <div style={{ display: 'flex', gap: '0.75rem', marginLeft: '1rem' }}>
+              {/* Ces boutons font appel à App.tsx pour afficher la modale */}
+              <button className="btn-login" onClick={onLoginRequest}>Se connecter</button>
+              <button className="btn-register" onClick={onRegisterRequest}>S'inscrire</button>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginLeft: '1rem' }}>
+              <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Mon Compte</span>
+              <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'var(--color-primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                JD
+              </div>
+            </div>
+          )}
+        </div>
+      </header>
+
+      <div className="page-container">
+        {/* MOTEUR DE RECHERCHE & PUBLICATION */}
         <div className="hero-search-section">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
             <div>
@@ -231,9 +241,8 @@ export default function Home({ onViewDetails, onBuy }: HomeProps) {
               <p style={{ margin: '4px 0 0', color: '#cbd5e1' }}>Recherchez parmi nos parcelles titrées et vérifiées à travers le Cameroun.</p>
             </div>
             
-            {/* Bouton d'action Vendeur pour publier son terrain */}
             <button 
-              onClick={() => setPublishModalOpen(true)}
+              onClick={onPublishRequest}
               className="btn" 
               style={{ background: '#ffffff', color: 'var(--color-primary-dark)', fontWeight: 800, padding: '0.65rem 1.25rem', display: 'flex', alignItems: 'center', gap: '0.4rem', width: 'auto', border: 'none', borderRadius: '8px' }}
             >
@@ -241,7 +250,6 @@ export default function Home({ onViewDetails, onBuy }: HomeProps) {
             </button>
           </div>
           
-          {/* MOTEUR DE RECHERCHE : UN UNIQUE INPUT (Nom, Ville, Titre Foncier) */}
           <div className="booking-search-panel" style={{ maxWidth: '640px', margin: '1.5rem 0 0' }}>
             <div className="search-field-group" style={{ borderRight: 'none' }}>
               <Search className="search-field-icon" />
@@ -255,9 +263,9 @@ export default function Home({ onViewDetails, onBuy }: HomeProps) {
           </div>
         </div>
 
-        {/* ═════════════════ SECTION 1 : RECHERCHER PAR TYPE DE TERRAIN ═════════════════ */}
+        {/* CATÉGORIES */}
         <h2 className="section-title">Rechercher par type de terrain</h2>
-        <p className="section-subtitle">Filtrez les offres foncières selon l'usage recherché [2].</p>
+        <p className="section-subtitle">Filtrez les offres foncières selon l'usage recherché.</p>
 
         <div className="category-grid">
           {CATEGORIES.map((cat) => (
@@ -275,7 +283,7 @@ export default function Home({ onViewDetails, onBuy }: HomeProps) {
           ))}
         </div>
 
-        {/* ═════════════════ GRILLE DES TERRAINS GÉNÉRAUX ═════════════════ */}
+        {/* GRILLE TERRAINS */}
         <h2 className="section-title">Nos parcelles recommandées</h2>
         <p className="section-subtitle">
           Découvrez notre sélection de terrains certifiés.
@@ -320,11 +328,11 @@ export default function Home({ onViewDetails, onBuy }: HomeProps) {
           )}
         </div>
 
-        {/* ═════════════════ SECTION 2 : DESTINATIONS EN VOGUE (BOUCLE INFINIE) ═════════════════ */}
+        {/* DESTINATIONS EN VOGUE */}
         <div className="infinite-section">
           <h2 className="section-title">Destinations en vogue au Cameroun</h2>
           <p className="section-subtitle">
-            Explorez les opportunités foncières par ville en cliquant sur les cartes défilantes ci-dessous [2].
+            Explorez les opportunités foncières par ville en cliquant sur les cartes défilantes ci-dessous.
           </p>
 
           <div className="infinite-slider">
@@ -348,7 +356,6 @@ export default function Home({ onViewDetails, onBuy }: HomeProps) {
             </div>
           </div>
 
-          {/* Affichage des parcelles de la ville sélectionnée */}
           <div className="city-results-area">
             {selectedCity ? (
               <div>
@@ -389,7 +396,7 @@ export default function Home({ onViewDetails, onBuy }: HomeProps) {
             </div>
           ) : (
             <div className="city-placeholder-text">
-              Cliquez sur une destination ci-dessus pour afficher instantanément ses terrains disponibles [2].
+              Cliquez sur une destination ci-dessus pour afficher instantanément ses terrains disponibles.
             </div>
           )}
         </div>
@@ -397,36 +404,26 @@ export default function Home({ onViewDetails, onBuy }: HomeProps) {
 
     </div>
 
-    {/* ═════════════════ FOOTER DESIGN ═════════════════ */}
-    <footer className="booking-footer">
-      <div className="footer-grid">
+    {/* NOUVEAU FOOTER ALLÉGÉ */}
+    <footer className="booking-footer" id="support">
+      <div className="footer-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
+        
+        <div className="footer-column" id="about">
+          <h4>À propos de nous</h4>
+          <p style={{ fontSize: '0.85rem', lineHeight: 1.6, color: '#94a3b8', margin: 0 }}>
+            MBOALAND est la première plateforme de numérisation foncière au Cameroun. Nous centralisons, vérifions et sécurisons vos transactions immobilières en étroite collaboration avec des notaires et des géomètres-experts assermentés par l'État.
+          </p>
+        </div>
+        
         <div className="footer-column">
-          <h4>Acheter un terrain</h4>
-          <ul>
-            <li><a href="#link">Comment ça marche ?</a></li>
-            <li><a href="#link">Sécuriser son cadastre</a></li>
-            <li><a href="#link">Frais de notaire</a></li>
-            <li><a href="#link">Trouver un géomètre</a></li>
+          <h4>Aide & Contact</h4>
+          <ul style={{ color: '#94a3b8', fontSize: '0.85rem', lineHeight: 1.8 }}>
+            <li>📞 +237 600 00 00 00</li>
+            <li>✉️ support@mboaland.cm</li>
+            <li>📍 Douala, Cameroun</li>
           </ul>
         </div>
-        <div className="footer-column">
-          <h4>À propos</h4>
-          <ul>
-            <li><a href="#link">Qui sommes-nous ?</a></li>
-            <li><a href="#link">Presse & Partenaires</a></li>
-            <li><a href="#link">Charte de confiance</a></li>
-            <li><a href="#link">CGU & Conditions</a></li>
-          </ul>
-        </div>
-        <div className="footer-column">
-          <h4>Assistance</h4>
-          <ul>
-            <li><a href="#link">Centre d'aide</a></li>
-            <li><a href="#link">Contacter un expert</a></li>
-            <li><a href="#link">Signaler une annonce</a></li>
-            <li><a href="#link">FAQ Cadastre</a></li>
-          </ul>
-        </div>
+        
         <div className="footer-column" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <h4>MBOALAND S.A.</h4>
           <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', fontSize: '0.85rem' }}>
@@ -442,145 +439,73 @@ export default function Home({ onViewDetails, onBuy }: HomeProps) {
             <span>Service Client H24</span>
           </div>
         </div>
+
       </div>
 
-      <div className="footer-bottom">
+      <div className="footer-bottom" style={{ justifyContent: 'center' }}>
         <span>© 2026 Mboaland S.A. Tous droits réservés. Numérisation foncière sécurisée.</span>
-        <span style={{ display: 'flex', gap: '1rem' }}>
-          <a href="#link" style={{ color: '#64748b', textDecoration: 'none' }}>Confidentialité</a>
-          <span>·</span>
-          <a href="#link" style={{ color: '#64748b', textDecoration: 'none' }}>Mentions Légales</a>
-        </span>
       </div>
     </footer>
 
-    {/* ═════════════════ MODALE VENDEUR : PUBLICATION DE TERRAIN ═════════════════ */}
-    {publishModalOpen && (
+    {/* MODALE VENDEUR (Contrôlée par App.tsx) */}
+    {isPublishModalOpen && (
       <div className="modal-overlay" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div className="modal-content-box" style={{ maxWidth: '580px', overflowY: 'auto', maxHeight: '90vh' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.75rem' }}>
             <h3 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0, color: 'var(--color-primary-dark)' }}>
               Publier un terrain sur MBOALAND
             </h3>
-            <X className="w-5 h-5 text-slate-400 cursor-pointer" onClick={() => setPublishModalOpen(false)} />
+            <X className="w-5 h-5 text-slate-400 cursor-pointer" onClick={onClosePublishModal} />
           </div>
 
           <form onSubmit={handlePublishTerrain} className="custom-form-grid" style={{ margin: 0 }}>
             <div style={{ gridColumn: 'span 2' }}>
               <label className="form-group-label">Nom de la parcelle / Titre d'annonce *</label>
-              <input 
-                type="text" 
-                placeholder="Ex: Terrain plat prêt à bâtir à Odza" 
-                className="form-group-input" 
-                value={newTitle}
-                onChange={(e) => setNewTitle(e.target.value)}
-                required
-              />
+              <input type="text" placeholder="Ex: Terrain plat prêt à bâtir à Odza" className="form-group-input" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} required />
             </div>
-            
             <div>
               <label className="form-group-label">Ville *</label>
-              <input 
-                type="text" 
-                placeholder="Ex: Yaoundé" 
-                className="form-group-input" 
-                value={newCity}
-                onChange={(e) => setNewCity(e.target.value)}
-                required
-              />
+              <input type="text" placeholder="Ex: Yaoundé" className="form-group-input" value={newCity} onChange={(e) => setNewCity(e.target.value)} required />
             </div>
-
             <div>
               <label className="form-group-label">Catégorie d'usage *</label>
-              <select 
-                className="form-group-input" 
-                value={newType}
-                onChange={(e) => setNewType(e.target.value as any)}
-              >
+              <select className="form-group-input" value={newType} onChange={(e) => setNewType(e.target.value as any)}>
                 <option value="residentiel">Résidentiel</option>
                 <option value="agricole">Agricole (Champs/Vergers)</option>
                 <option value="commercial">Commercial (Bureaux/Immeubles)</option>
                 <option value="industriel">Industriel (Entrepôts/Usines)</option>
               </select>
             </div>
-
             <div>
               <label className="form-group-label">N° de Titre Foncier *</label>
-              <input 
-                type="text" 
-                placeholder="Ex: TF-4481/CM/CEN" 
-                className="form-group-input" 
-                value={newLandTitle}
-                onChange={(e) => setNewLandTitle(e.target.value)}
-                required
-              />
+              <input type="text" placeholder="Ex: TF-4481/CM/CEN" className="form-group-input" value={newLandTitle} onChange={(e) => setNewLandTitle(e.target.value)} required />
             </div>
-
             <div>
               <label className="form-group-label">Prix demandé (FCFA) *</label>
-              <input 
-                type="text" 
-                placeholder="Ex: 8000000" 
-                className="form-group-input" 
-                value={newPrice}
-                onChange={(e) => setNewPrice(e.target.value)}
-                required
-              />
+              <input type="text" placeholder="Ex: 8000000" className="form-group-input" value={newPrice} onChange={(e) => setNewPrice(e.target.value)} required />
             </div>
-
             <div>
               <label className="form-group-label">Superficie (m²)</label>
-              <input 
-                type="text" 
-                placeholder="Ex: 1 200 m²" 
-                className="form-group-input" 
-                value={newArea}
-                onChange={(e) => setNewArea(e.target.value)}
-              />
+              <input type="text" placeholder="Ex: 1 200 m²" className="form-group-input" value={newArea} onChange={(e) => setNewArea(e.target.value)} />
             </div>
-
             <div>
               <label className="form-group-label">Nom complet du propriétaire *</label>
-              <input 
-                type="text" 
-                placeholder="Ex: Jean Dupont" 
-                className="form-group-input" 
-                value={newOwner}
-                onChange={(e) => setNewOwner(e.target.value)}
-                required
-              />
+              <input type="text" placeholder="Ex: Jean Dupont" className="form-group-input" value={newOwner} onChange={(e) => setNewOwner(e.target.value)} required />
             </div>
-
             <div style={{ gridColumn: 'span 2' }}>
               <label className="form-group-label">Description du terrain</label>
-              <textarea 
-                placeholder="Décrivez l'accès, l'environnement, la viabilisation..." 
-                className="form-group-input" 
-                rows={3} 
-                style={{ resize: 'vertical' }}
-                value={newDesc}
-                onChange={(e) => setNewDesc(e.target.value)}
-              />
+              <textarea placeholder="Décrivez l'accès, l'environnement, la viabilisation..." className="form-group-input" rows={3} style={{ resize: 'vertical' }} value={newDesc} onChange={(e) => setNewDesc(e.target.value)} />
             </div>
-
-            {/* Téléversement de la copie de Titre Foncier */}
             <div style={{ gridColumn: 'span 2' }}>
-              <span className="form-group-label" style={{ marginBottom: '0.5rem', display: 'block' }}>
-                Copie conforme du Titre Foncier (PDF, Optionnel)
-              </span>
+              <span className="form-group-label" style={{ marginBottom: '0.5rem', display: 'block' }}>Copie conforme du Titre Foncier (PDF, Optionnel)</span>
               <div style={{ border: '1px dashed #cbd5e1', backgroundColor: '#f8fafc', borderRadius: '8px', padding: '1rem', textAlign: 'center', cursor: 'pointer' }}>
                 <UploadCloud className="w-6 h-6 text-slate-400 mx-auto mb-1" />
                 <span style={{ fontSize: '0.78rem', fontWeight: 600 }}>Parcourir ou déposer le fichier</span>
               </div>
             </div>
-
             <div style={{ gridColumn: 'span 2', display: 'flex', gap: '0.75rem', marginTop: '1rem', borderTop: '1px solid #e2e8f0', paddingTop: '1.25rem' }}>
-              <button type="button" className="btn btn-airbnb btn-airbnb-details" onClick={() => setPublishModalOpen(false)}>
-                Annuler
-              </button>
-              <button type="submit" className="btn btn-airbnb btn-airbnb-buy">
-                Publier l'annonce de vente
-              </button>
+              <button type="button" className="btn btn-airbnb btn-airbnb-details" onClick={onClosePublishModal}>Annuler</button>
+              <button type="submit" className="btn btn-airbnb btn-airbnb-buy">Publier l'annonce de vente</button>
             </div>
           </form>
         </div>

@@ -20,10 +20,16 @@ export default function Purchase({ terrain, onBack, onSubmitSuccess }: PurchaseP
   const fmt = (val: number) => val.toLocaleString('fr-FR') + ' FCFA';
 
   const notairesPartenaires = [
-    { id: 'n1', name: 'Me Mireille Dubois', detail: 'Cabinet Littoral · Douala', rating: '4.9 (127 dossiers)', fee: 40000, initial: 'MD' },
-    { id: 'n2', name: 'Me Jean-Paul Nkodo', detail: 'Cabinet Centre · Yaoundé', rating: '4.7 (89 dossiers)', fee: 35000, initial: 'JN' },
-    { id: 'n3', name: 'Me Awa Bello', detail: 'Cabinet Ouest · Bafoussam', rating: '4.8 (62 dossiers)', fee: 32000, initial: 'AB' },
+    { id: 'n1', name: 'Me Mireille Dubois', detail: 'Cabinet Littoral · Douala', fee: 40000, initial: 'MD' },
+    { id: 'n2', name: 'Me Jean-Paul Nkodo', detail: 'Cabinet Centre · Yaoundé', fee: 35000, initial: 'JN' },
+    { id: 'n3', name: 'Me Awa Bello', detail: 'Cabinet Ouest · Bafoussam', fee: 32000, initial: 'AB' },
   ];
+
+  //  const notairesPartenaires = [
+  //   { id: 'n1', name: 'Me Mireille Dubois', detail: 'Cabinet Littoral · Douala', rating: '4.9 (127 dossiers)', fee: 40000, initial: 'MD' },
+  //   { id: 'n2', name: 'Me Jean-Paul Nkodo', detail: 'Cabinet Centre · Yaoundé', rating: '4.7 (89 dossiers)', fee: 35000, initial: 'JN' },
+  //   { id: 'n3', name: 'Me Awa Bello', detail: 'Cabinet Ouest · Bafoussam', rating: '4.8 (62 dossiers)', fee: 32000, initial: 'AB' },
+  // ];
 
   const handleSelectNotaire = (n: typeof notairesPartenaires[0]) => {
     setSelectedNotaire({ id: n.id, name: n.name, fee: n.fee });
@@ -85,9 +91,9 @@ export default function Purchase({ terrain, onBack, onSubmitSuccess }: PurchaseP
               <div style={{ flex: 1 }}>
                 <h4 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0 }}>{n.name}</h4>
                 <p style={{ fontSize: '0.78rem', color: 'var(--color-text-light)', margin: '0.15rem 0' }}>{n.detail}</p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.8rem', color: '#f59e0b', fontWeight: 700 }}>
+                {/* <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.8rem', color: '#f59e0b', fontWeight: 700 }}>
                   <Star className="w-3.5 h-3.5 fill-amber-500 stroke-none" /> {n.rating}
-                </div>
+                </div> */}
               </div>
               <div style={{ textAlign: 'right' }}>
                 <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-primary)', display: 'block' }}>
