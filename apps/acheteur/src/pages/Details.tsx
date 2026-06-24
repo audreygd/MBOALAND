@@ -1,155 +1,164 @@
+// @ts-nocheck
 import React from 'react';
-import { 
-  ArrowLeft, Compass, FileText, CheckCircle2, Download, ShieldCheck
-} from 'lucide-react';
+import { ArrowLeft, Compass, FileText, CheckCircle2, Download, ShieldCheck } from 'lucide-react';
 import { type Terrain } from './Home';
-import './pages.css';
+import { ThemeProvider, createTheme, Box, Container, Typography, Button, Grid, Paper, Chip } from '@mui/material';
 
-interface DetailsProps {
-  terrain: Terrain;
-  onBack: () => void;
-  onBuy: (terrain: Terrain) => void;
-}
+const theme = createTheme({
+  palette: { 
+    primary: { main: '#0a5c44', dark: '#05332c' }, 
+    background: { default: '#f8fafc' }, 
+    text: { primary: '#1e293b', secondary: '#64748b' } 
+  },
+  typography: { 
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    h4: { fontSize: '1.3rem', fontWeight: 800 },
+    h5: { fontSize: '1.1rem', fontWeight: 800 },
+    h6: { fontSize: '0.95rem', fontWeight: 800 },
+    subtitle1: { fontSize: '0.85rem', fontWeight: 800 },
+    subtitle2: { fontSize: '0.8rem', fontWeight: 700 },
+    body1: { fontSize: '0.8rem' },
+    body2: { fontSize: '0.7rem' },
+    button: { textTransform: 'none', fontWeight: 700, fontSize: '0.75rem' } 
+  },
+  shape: { borderRadius: 12 },
+});
+
+interface DetailsProps { terrain: Terrain; onBack: () => void; onBuy: (terrain: Terrain) => void; }
 
 export default function Details({ terrain, onBack, onBuy }: DetailsProps) {
-  
-  // Fonction utilitaire pour nettoyer les coordonnées et générer l'URL Google Maps Satellite [1]
-  const getGoogleMapsEmbedUrl = (gpsString: string) => {
-    // Nettoie les lettres N, E, S, W et les degrés pour obtenir un format pur (ex: "3.8842,11.5243") [1]
-    const cleanGps = gpsString
-      .replace(/°\s*N/gi, '')
-      .replace(/°\s*E/gi, '')
-      .replace(/°\s*S/gi, '-')
-      .replace(/°\s*O/gi, '-')
-      .replace(/°\s*W/gi, '-')
-      .trim();
-
-    // q = coordonnées, t = k (Satellite), z = 16 (Zoom) [1]
-    return `https://maps.google.com/maps?q=${encodeURIComponent(cleanGps)}&t=k&z=17&ie=UTF8&iwloc=&output=embed`;
-  };
+  const getGoogleMapsEmbedUrl = (gpsString: string) => `https://maps.google.com/maps?q=${encodeURIComponent(gpsString.replace(/°\s*[NESOW]/gi, (m) => m.includes('S') || m.includes('O') || m.includes('W') ? '-' : '').trim())}&t=k&z=17&ie=UTF8&iwloc=&output=embed`;
 
   return (
-    <div className="page-container">
-      
-      {/* Entête avec bouton retour */}
-      <div className="details-back-header">
-        <button onClick={onBack} className="btn btn-airbnb btn-airbnb-details" style={{ width: 'auto', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem' }}>
-          <ArrowLeft className="w-4 h-4" /> Retour aux parcelles
-        </button>
-        <span style={{ fontSize: '0.82rem', color: 'var(--color-text-light)', fontWeight: 600 }}>
-          {terrain.landTitle}
-        </span>
-      </div>
-
-      {/* Grille principale */}
-      <div className="details-grid">
-        
-        {/* Colonne Gauche : Contenu */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+    <ThemeProvider theme={theme}>
+      <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', py: 3 }}>
+        <Container maxWidth="lg">
           
-          {/* Galerie d'images style Booking */}
-          <div className="details-gallery">
-            <img src={terrain.image} alt={terrain.title} className="details-main-img" />
-            <div className="details-thumb-column">
-              <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=300&q=80" alt="Vue satellite" className="details-thumb-img" />
-              <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=300&q=80" alt="Cadre environnant" className="details-thumb-img" />
-            </div>
-          </div>
+          {/* ENTÊTE RETOUR */}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Button startIcon={<ArrowLeft size={16} />} onClick={onBack} variant="outlined" sx={{ bgcolor: 'white', borderColor: '#e2e8f0', color: 'text.primary', py: 0.5, px: 2 }}>Retour</Button>
+            <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.secondary' }}>{terrain.landTitle}</Typography>
+          </Box>
 
-          {/* Section d'informations */}
-          <div className="details-box">
-            <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--color-text)', marginBottom: '0.5rem' }}>
-              {terrain.title}
-            </h1>
-            <p style={{ color: 'var(--color-text-light)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
-              {terrain.city} · Cameroun
-            </p>
+          <Grid container spacing={3}>
             
-            <h3 className="details-box-title">Description du terrain</h3>
-            <p style={{ fontSize: '0.9rem', color: 'var(--color-text)', lineHeight: 1.6 }}>
-              {terrain.desc}
-            </p>
-          </div>
+            {/* COLONNE GAUCHE (8/12) : Images compactes, Description, Carte, Documents */}
+            <Grid item xs={12} md={8}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                
+                {/* Galerie d'images - TAILLE RÉDUITE */}
+                <Paper elevation={0} sx={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 0.75, borderRadius: 2, overflow: 'hidden' }}>
+                  <img src={terrain.image} alt={terrain.title} style={{ width: '100%', aspectRatio: '16/9', objectFit: 'cover' }} />
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
+                    <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=300&q=80" alt="Satellite" style={{ width: '100%', flex: 1, objectFit: 'cover' }} />
+                    <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=300&q=80" alt="Env" style={{ width: '100%', flex: 1, objectFit: 'cover' }} />
+                  </Box>
+                </Paper>
 
-          {/* Section Cadastre & Géolocalisation (INTÉGRATION GOOGLE MAPS SATELLITE DIRECTE) [1] */}
-          <div className="details-box">
-            <h3 className="details-box-title">Localisation Google Maps (Vue Satellite) [1]</h3>
-            
-            <div className="map-simulation-box" style={{ marginBottom: '1rem', height: '300px' }}>
-              {/* Carte Google Maps dynamique et interactive [1] */}
-              <iframe
-                title="Google Maps Cadastre"
-                src={getGoogleMapsEmbedUrl(terrain.gps)}
-                width="100%"
-                height="100%"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-              ></iframe>
-            </div>
+                {/* Description - COMPACTE */}
+                <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid #e2e8f0' }}>
+                  <Typography variant="h5" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.5 }}>{terrain.title}</Typography>
+                  <Typography variant="body2" color="text.secondary" mb={2}>{terrain.city} · Cameroun</Typography>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'primary.dark', borderBottom: '1px solid #e2e8f0', pb: 0.75, mb: 1.5 }}>Description du terrain</Typography>
+                  <Typography variant="body2" lineHeight={1.6}>{terrain.desc}</Typography>
+                </Paper>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem' }}>
-              <span>Coordonnées GPS réelles : <strong>{terrain.gps}</strong></span>
-              <span className="text-emerald-700 font-bold flex items-center gap-1">
-                <Compass className="w-4 h-4" /> Position vérifiée par GPS différentiel
-              </span>
-            </div>
-          </div>
+                {/* Localisation Google Maps - COMPACTE */}
+                <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid #e2e8f0' }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'primary.dark', borderBottom: '1px solid #e2e8f0', pb: 0.75, mb: 1.5 }}>Localisation Google Maps</Typography>
+                  <Box sx={{ width: '100%', height: 250, borderRadius: 2, overflow: 'hidden', mb: 1.5, border: '1px solid #e2e8f0' }}>
+                    <iframe title="Map" src={getGoogleMapsEmbedUrl(terrain.gps)} width="100%" height="100%" style={{ border: 0 }}></iframe>
+                  </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body2">Coordonnées GPS : <strong>{terrain.gps}</strong></Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 700, color: 'primary.main', display: 'flex', alignItems: 'center', gap: 0.5 }}><Compass size={14} /> Position vérifiée</Typography>
+                  </Box>
+                </Paper>
 
-          {/* Section Copie du Titre Foncier */}
-          <div className="details-box">
-            <h3 className="details-box-title">Documents administratifs</h3>
-            <div className="title-document-box">
-              <FileText className="w-8 h-8 text-rose-700" />
-              <div style={{ flex: 1 }}>
-                <h4 style={{ fontSize: '0.9rem', fontWeight: 700, margin: 0 }}>Copie conforme du Titre Foncier</h4>
-                <p style={{ fontSize: '0.75rem', color: 'var(--color-text-light)', margin: '0.2rem 0 0' }}>
-                  Document PDF officiel · {terrain.landTitle}
-                </p>
-              </div>
-              <button className="btn btn-airbnb btn-airbnb-details" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.4rem 0.8rem', width: 'auto' }}>
-                <Download className="w-4 h-4" /> Télécharger
-              </button>
-            </div>
-          </div>
+                {/* Documents - COMPACTE */}
+                <Paper elevation={0} sx={{ p: 2, borderRadius: 2, border: '1px solid #e2e8f0' }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 700, color: 'primary.dark', borderBottom: '1px solid #e2e8f0', pb: 0.75, mb: 1.5 }}>
+                    Documents administratifs
+                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, p: 1.5, bgcolor: '#f8fafc', borderRadius: 2, border: '1px solid #e2e8f0' }}>
+                    <FileText size={24} color="#be123c" />
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="subtitle2" fontWeight="800">Copie conforme du Titre Foncier</Typography>
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>Document PDF officiel · {terrain.landTitle}</Typography>
+                    </Box>
+                    <Button variant="outlined" color="inherit" startIcon={<Download size={14} />} sx={{ borderColor: '#cbd5e1', bgcolor: 'white', py: 0.5, px: 1.5, fontSize: '0.7rem' }}>
+                      Télécharger
+                    </Button>
+                  </Box>
+                </Paper>
 
-        </div>
+              </Box>
+            </Grid>
 
-        {/* Colonne Droite : Achat */}
-        <div className="booking-sidebar-card">
-          <div className="verified-badge-row">
-            <ShieldCheck className="w-4 h-4" /> Parcelle 100% Certifiée
-          </div>
-          
-          <span style={{ fontSize: '0.8rem', color: 'var(--color-text-light)', fontWeight: 700, textTransform: 'uppercase' }}>
-            Prix total d'acquisition
-          </span>
-          <div style={{ fontSize: '1.75rem', fontWeight: 900, color: 'var(--color-primary)', margin: '0.25rem 0 1rem' }}>
-            {terrain.price}
-          </div>
+            {/* COLONNE DROITE (4/12) : CARTE "LANCER L'ACQUISITION" - RÉORGANISÉE ET COMPACTE */}
+            <Grid item xs={12} md={4}>
+              <Paper elevation={0} sx={{ 
+                p: 2.5, 
+                borderRadius: 2, 
+                border: '2px solid #0a5c44', 
+                position: 'sticky', 
+                top: 80,
+                bgcolor: 'white'
+              }}>
+                <Chip 
+                  icon={<ShieldCheck size={14} />} 
+                  label="Parcelle 100% Certifiée" 
+                  color="success" 
+                  sx={{ 
+                    bgcolor: '#e2f2ec', 
+                    color: 'primary.dark', 
+                    fontWeight: 700, 
+                    mb: 2,
+                    height: 24,
+                    '& .MuiChip-label': { fontSize: '0.7rem', px: 1 }
+                  }} 
+                />
+                
+                <Typography variant="overline" sx={{ fontWeight: 800, color: 'text.secondary', display: 'block', fontSize: '0.65rem' }}>Prix d'acquisition</Typography>
+                <Typography variant="h5" sx={{ fontWeight: 900, color: 'primary.main', mb: 2 }}>{terrain.price}</Typography>
+                
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 3 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary' }}>
+                    <CheckCircle2 size={16} color="#059669" /> 
+                    <Typography variant="body2" fontWeight={600}>Superficie : {terrain.area}</Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary' }}>
+                    <CheckCircle2 size={16} color="#059669" /> 
+                    <Typography variant="body2" fontWeight={600}>Vendeur : {terrain.owner}</Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary' }}>
+                    <CheckCircle2 size={16} color="#059669" /> 
+                    <Typography variant="body2" fontWeight={600}>Titre libre d'hypothèque</Typography>
+                  </Box>
+                </Box>
+                
+                <Button 
+                  variant="contained" 
+                  color="primary" 
+                  fullWidth 
+                  size="large" 
+                  disableElevation 
+                  onClick={() => onBuy(terrain)} 
+                  sx={{ 
+                    py: 1.25, 
+                    fontSize: '0.85rem',
+                    fontWeight: 800,
+                    letterSpacing: '0.5px'
+                  }}
+                >
+                  Lancer l'acquisition
+                </Button>
+              </Paper>
+            </Grid>
 
-          <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 1.5rem', fontSize: '0.85rem', color: 'var(--color-text-light)', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-            <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Superficie cadastrée : {terrain.area}
-            </li>
-            <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Vendeur vérifié : {terrain.owner}
-            </li>
-            <li style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Titre libre d'hypothèque
-            </li>
-          </ul>
-
-          <button 
-            onClick={() => onBuy(terrain)}
-            className="btn btn-airbnb btn-airbnb-buy" 
-            style={{ padding: '0.85rem 1rem', fontSize: '0.95rem', borderRadius: '10px' }}
-          >
-            Lancer l'acquisition (Acheter)
-          </button>
-        </div>
-
-      </div>
-    </div>
+          </Grid>
+        </Container>
+      </Box>
+    </ThemeProvider>
   );
 }

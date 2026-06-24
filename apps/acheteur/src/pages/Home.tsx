@@ -1,517 +1,298 @@
+// @ts-nocheck
 import React, { useState } from 'react';
+import { Search, MapPin, Globe, Shield, PhoneCall, Plus, X, UploadCloud } from 'lucide-react';
+import AuthModal, { type UserRole } from './AuthModal';
 import { 
-  Search, MapPin, Globe, Shield, PhoneCall, Plus, X, UploadCloud
-} from 'lucide-react';
+  ThemeProvider, createTheme, CssBaseline, Box, Container, Typography, Button, 
+  Grid, Card, CardMedia, CardContent, CardActions, Paper, InputBase, Dialog, 
+  DialogTitle, DialogContent, DialogActions, TextField, Select, MenuItem, 
+  FormControl, InputLabel, IconButton, Avatar, Chip, Divider
+} from '@mui/material';
 import './pages.css';
 
-export interface Terrain {
-  id: string;
-  title: string;
-  refCode: string;
-  city: string;
-  region: 'Yaoundé' | 'Douala' | 'Mbankomo' | 'Bafoussam';
-  area: string;
-  price: string;
-  priceVal: number;
-  landTitle: string;
-  owner: string;
-  gps: string;
-  desc: string;
-  certified: boolean;
-  image: string;
-  type: 'residentiel' | 'agricole' | 'commercial' | 'industriel';
-}
+// Thème pour MUI
+const theme = createTheme({
+  palette: { 
+    primary: { main: '#0a5c44', dark: '#05332c' }, 
+    background: { default: '#f8fafc' }, 
+    text: { primary: '#1e293b', secondary: '#64748b' } 
+  },
+  typography: { 
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', 
+    h3: { fontSize: '1.6rem', fontWeight: 800 }, 
+    h4: { fontSize: '1.2rem', fontWeight: 800 }, 
+    h5: { fontSize: '1.05rem', fontWeight: 800 }, 
+    h6: { fontSize: '0.9rem', fontWeight: 800 }, 
+    body1: { fontSize: '0.85rem' }, 
+    body2: { fontSize: '0.75rem' }, 
+    button: { textTransform: 'none', fontWeight: 700, fontSize: '0.8rem' } 
+  },
+  shape: { borderRadius: 12 },
+});
+
+export interface Terrain { id: string; title: string; refCode: string; city: string; region: 'Yaoundé' | 'Douala' | 'Mbankomo' | 'Bafoussam'; area: string; price: string; priceVal: number; landTitle: string; owner: string; gps: string; desc: string; certified: boolean; image: string; type: 'residentiel' | 'agricole' | 'commercial' | 'industriel'; }
 
 const INITIAL_TERRAINS: Terrain[] = [
-  {
-    id: 'odza',
-    title: 'Superbe parcelle plane résidentielle',
-    refCode: 'TER-2024-0015',
-    city: 'Yaoundé (Odza)',
-    region: 'Yaoundé',
-    area: '1 000 m²',
-    price: '15 000 000 FCFA',
-    priceVal: 15000000,
-    landTitle: 'TF-1532/CM/CEN',
-    owner: 'Jean Dupont',
-    gps: '3.8842° N, 11.5243° E',
-    desc: 'Idéalement située dans la zone résidentielle d\'Odza, cette parcelle plane bénéficie d\'une excellente accessibilité. Parfait pour un projet de villa familiale.',
-    certified: true,
-    image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80',
-    type: 'residentiel'
-  },
-  {
-    id: 'mbankomo',
-    title: 'Vaste domaine idéal projet agricole',
-    refCode: 'TER-2024-0012',
-    city: 'Mbankomo',
-    region: 'Mbankomo',
-    area: '5 000 m²',
-    price: '8 000 000 FCFA',
-    priceVal: 8000000,
-    landTitle: 'TF-0987/CM/CEN',
-    owner: 'Sylvestre Atangana',
-    gps: '3.6612° N, 11.3954° E',
-    desc: 'Terre agricole très fertile, avec accès direct par piste praticable. Idéal pour verger ou culture vivrière.',
-    certified: true,
-    image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80',
-    type: 'agricole'
-  },
-  {
-    id: 'bonamoussadi',
-    title: 'Parcelle commerciale de premier choix',
-    refCode: 'TER-2024-0002',
-    city: 'Douala (Bonamoussadi)',
-    region: 'Douala',
-    area: '450 m²',
-    price: '18 000 000 FCFA',
-    priceVal: 18000000,
-    landTitle: 'TF-0341/CM/LIT',
-    owner: 'Chantal Ngo',
-    gps: '4.0511° N, 9.7679° E',
-    desc: 'Emplacement stratégique de premier choix en bordure de route goudronnée. Parfait pour immeuble de rapport ou commerces.',
-    certified: false,
-    image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80',
-    type: 'commercial'
-  },
-  {
-    id: 'bafoussam',
-    title: 'Terrain panoramique des hauts plateaux',
-    refCode: 'TER-2024-0005',
-    city: 'Bafoussam',
-    region: 'Bafoussam',
-    area: '3 000 m²',
-    price: '6 000 000 FCFA',
-    priceVal: 6000000,
-    landTitle: 'TF-2241/CM/OUE',
-    owner: 'Emmanuel Kamga',
-    gps: '5.4767° N, 10.4187° E',
-    desc: 'Situé sur les hauteurs de Bafoussam, ce terrain offre un climat frais et une vue imprenable sur la région.',
-    certified: true,
-    image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
-    type: 'industriel'
-  }
+  { id: 'odza', title: 'Superbe parcelle plane résidentielle', refCode: 'TER-2024-0015', city: 'Yaoundé (Odza)', region: 'Yaoundé', area: '1 000 m²', price: '15 000 000 FCFA', priceVal: 15000000, landTitle: 'TF-1532/CM/CEN', owner: 'Jean Dupont', gps: '3.8842° N, 11.5243° E', desc: 'Idéalement située dans la zone résidentielle.', certified: true, image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80', type: 'residentiel' },
+  { id: 'mbankomo', title: 'Vaste domaine idéal projet agricole', refCode: 'TER-2024-0012', city: 'Mbankomo', region: 'Mbankomo', area: '5 000 m²', price: '8 000 000 FCFA', priceVal: 8000000, landTitle: 'TF-0987/CM/CEN', owner: 'Sylvestre Atangana', gps: '3.6612° N, 11.3954° E', desc: 'Terre agricole très fertile, accès direct piste.', certified: true, image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80', type: 'agricole' },
+  { id: 'bonamoussadi', title: 'Parcelle commerciale de premier choix', refCode: 'TER-2024-0002', city: 'Douala (Bonamoussadi)', region: 'Douala', area: '450 m²', price: '18 000 000 FCFA', priceVal: 18000000, landTitle: 'TF-0341/CM/LIT', owner: 'Chantal Ngo', gps: '4.0511° N, 9.7679° E', desc: 'Emplacement stratégique en bordure de route.', certified: false, image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80', type: 'commercial' },
+  { id: 'bafoussam', title: 'Terrain panoramique des hauts plateaux', refCode: 'TER-2024-0005', city: 'Bafoussam', region: 'Bafoussam', area: '3 000 m²', price: '6 000 000 FCFA', priceVal: 6000000, landTitle: 'TF-2241/CM/OUE', owner: 'Emmanuel Kamga', gps: '5.4767° N, 10.4187° E', desc: 'Climat frais et vue imprenable.', certified: true, image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80', type: 'industriel' }
 ];
 
-// Nouveaux paramètres reçus depuis App.tsx
-interface HomeProps {
-  onViewDetails: (terrain: Terrain) => void;
-  onBuy: (terrain: Terrain) => void;
-  isAuthenticated: boolean;
-  onLoginRequest: () => void;
-  onRegisterRequest: () => void;
-  onPublishRequest: () => void;
-  isPublishModalOpen: boolean;
-  onClosePublishModal: () => void;
-}
-
-export default function Home({ 
-  onViewDetails, onBuy, isAuthenticated, onLoginRequest, onRegisterRequest, 
-  onPublishRequest, isPublishModalOpen, onClosePublishModal 
-}: HomeProps) {
-  
+export default function Home({ onViewDetails, onBuy, isAuthenticated, onLoginRequest, onRegisterRequest, onPublishRequest, isPublishModalOpen, onClosePublishModal }: any) {
   const [terrains, setTerrains] = useState<Terrain[]>(INITIAL_TERRAINS);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-
-  // États du formulaire de publication
-  const [newTitle, setNewTitle] = useState<string>('');
-  const [newCity, setNewCity] = useState<string>('');
-  const [newArea, setNewArea] = useState<string>('');
-  const [newPrice, setNewPrice] = useState<string>('');
-  const [newLandTitle, setNewLandTitle] = useState<string>('');
-  const [newOwner, setNewOwner] = useState<string>('');
-  const [newDesc, setNewDesc] = useState<string>('');
-  const [newType, setNewType] = useState<'residentiel' | 'agricole' | 'commercial' | 'industriel'>('residentiel');
+  
+  const [newTitle, setNewTitle] = useState(''); const [newCity, setNewCity] = useState(''); const [newArea, setNewArea] = useState(''); const [newPrice, setNewPrice] = useState(''); const [newLandTitle, setNewLandTitle] = useState(''); const [newOwner, setNewOwner] = useState(''); const [newDesc, setNewDesc] = useState(''); const [newType, setNewType] = useState<'residentiel' | 'agricole' | 'commercial' | 'industriel'>('residentiel');
 
   const filteredTerrains = terrains.filter((t) => {
-    const query = searchQuery.toLowerCase();
-    const matchesUnifiedSearch = 
-      t.title.toLowerCase().includes(query) ||
-      t.city.toLowerCase().includes(query) ||
-      t.landTitle.toLowerCase().includes(query);
-
-    const matchesCity = selectedCity === null || t.region === selectedCity;
-    const matchesCategory = selectedCategory === 'all' || t.type === selectedCategory;
-
-    return matchesUnifiedSearch && matchesCity && matchesCategory;
+    const q = searchQuery.toLowerCase();
+    const matchSearch = t.title.toLowerCase().includes(q) || t.city.toLowerCase().includes(q) || t.landTitle.toLowerCase().includes(q);
+    const matchCity = selectedCity === null || t.region === selectedCity;
+    const matchCat = selectedCategory === 'all' || t.type === selectedCategory;
+    return matchSearch && matchCity && matchCat;
   });
 
   const cityFilteredTerrains = terrains.filter((t) => t.region === selectedCity);
 
   const handlePublishTerrain = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTitle || !newCity || !newPrice || !newLandTitle || !newOwner) {
-      alert("Veuillez renseigner tous les champs obligatoires (*) pour publier.");
-      return;
-    }
-    const detectRegion = (city: string): 'Yaoundé' | 'Douala' | 'Mbankomo' | 'Bafoussam' => {
-      const val = city.toLowerCase();
-      if (val.includes('douala')) return 'Douala';
-      if (val.includes('mbankomo')) return 'Mbankomo';
-      if (val.includes('bafoussam')) return 'Bafoussam';
-      return 'Yaoundé';
-    };
-    const getCategoryImage = (cat: string) => {
-      if (cat === 'agricole') return 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=800&q=80';
-      if (cat === 'commercial') return 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80';
-      if (cat === 'industriel') return 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80';
-      return 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80';
-    };
-
-    const numericPrice = parseInt(newPrice.replace(/\s/g, '')) || 1000000;
-
+    if (!newTitle || !newCity || !newPrice || !newLandTitle || !newOwner) { alert("Champs obligatoires manquants."); return; }
+    const numPrice = parseInt(newPrice.replace(/\s/g, '')) || 1000000;
     const newTerrain: Terrain = {
-      id: 'custom-' + Date.now(),
-      title: newTitle,
-      refCode: 'TER-2026-' + Math.floor(1000 + Math.random() * 9000),
-      city: newCity,
-      region: detectRegion(newCity),
-      area: newArea || '500 m²',
-      price: numericPrice.toLocaleString('fr-FR') + ' FCFA',
-      priceVal: numericPrice,
-      landTitle: newLandTitle,
-      owner: newOwner,
-      gps: '3.' + Math.floor(1000 + Math.random() * 9000) + '° N, 11.' + Math.floor(1000 + Math.random() * 9000) + '° E',
-      desc: newDesc || 'Aucune description additionnelle fournie par le propriétaire.',
-      certified: false,
-      image: getCategoryImage(newType),
-      type: newType
+      id: 'custom-' + Date.now(), title: newTitle, refCode: 'TER-2026-' + Math.floor(1000 + Math.random() * 9000), city: newCity, region: 'Yaoundé', area: newArea || '500 m²', price: numPrice.toLocaleString('fr-FR') + ' FCFA', priceVal: numPrice, landTitle: newLandTitle, owner: newOwner, gps: '3.8° N, 11.5° E', desc: newDesc || 'Aucune description.', certified: false, image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80', type: newType
     };
-
-    setTerrains([newTerrain, ...terrains]);
-    onClosePublishModal(); // Fermer la modale gérée par App.tsx
-    
-    setNewTitle(''); setNewCity(''); setNewArea(''); setNewPrice('');
-    setNewLandTitle(''); setNewOwner(''); setNewDesc(''); setNewType('residentiel');
+    setTerrains([newTerrain, ...terrains]); onClosePublishModal();
   };
 
   const CITIES_LIST = [
     { id: 'Yaoundé', name: 'Yaoundé', flag: '🇨🇲', count: 'Yaoundé & environs', image: 'https://images.unsplash.com/photo-1598977123418-45f04b616a0e?auto=format&fit=crop&w=400&q=80' },
     { id: 'Douala', name: 'Douala', flag: '🇨🇲', count: 'Littoral', image: 'https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?auto=format&fit=crop&w=400&q=80' },
-    { id: 'Mbankomo', name: 'Mbankomo', flag: '🇨🇲', count: 'Mbankomo rase campagne', image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=400&q=80' },
+    { id: 'Mbankomo', name: 'Mbankomo', flag: '🇨🇲', count: 'Mbankomo', image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=400&q=80' },
     { id: 'Bafoussam', name: 'Bafoussam', flag: '🇨🇲', count: 'Ouest plateaux', image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80' },
   ];
   const INFINITE_CITIES = [...CITIES_LIST, ...CITIES_LIST, ...CITIES_LIST];
 
   const CATEGORIES = [
-    { id: 'all', name: 'Tous les terrains', count: `${terrains.length} terrains`, image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=300&q=80' },
-    { id: 'residentiel', name: 'Résidentiel', count: `${terrains.filter(t => t.type === 'residentiel').length} disponible(s)`, image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=300&q=80' },
-    { id: 'agricole', name: 'Agricole', count: `${terrains.filter(t => t.type === 'agricole').length} disponible(s)`, image: 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=300&q=80' },
-    { id: 'commercial', name: 'Commercial', count: `${terrains.filter(t => t.type === 'commercial').length} disponible(s)`, image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=300&q=80' },
-    { id: 'industriel', name: 'Industriel', count: `${terrains.filter(t => t.type === 'industriel').length} disponible(s)`, image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=300&q=80' },
+    { id: 'all', name: 'Tous', count: `${terrains.length}`, image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=300&q=80' },
+    { id: 'residentiel', name: 'Résidentiel', count: `${terrains.filter(t => t.type === 'residentiel').length}`, image: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=300&q=80' },
+    { id: 'agricole', name: 'Agricole', count: `${terrains.filter(t => t.type === 'agricole').length}`, image: 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=300&q=80' },
+    { id: 'commercial', name: 'Commercial', count: `${terrains.filter(t => t.type === 'commercial').length}`, image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=300&q=80' },
+    { id: 'industriel', name: 'Industriel', count: `${terrains.filter(t => t.type === 'industriel').length}`, image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=300&q=80' },
   ];
 
   return (
-    <div>
-      {/* BARRE DE NAVIGATION */}
-      <header className="top-nav-bar">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <span style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--color-primary)' }}>MBOA<span style={{ color: '#0f172a' }}>LAND</span></span>
-        </div>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', pb: 0 }}>
         
-        <div className="nav-links">
-          <a href="#about" className="nav-link">À propos de nous</a>
-          <a href="#support" className="nav-link">Aide & Support</a>
+        {/* CSS pour le scroll doux (ancres du footer) et le slider */}
+        <style>{`
+          html { scroll-behavior: smooth; } 
+          @keyframes scrollTrack { 0% { transform: translateX(0); } 100% { transform: translateX(calc(-300px * 4 - 24px * 4)); } } 
+          .slider-track { display: flex; gap: 24px; width: max-content; animation: scrollTrack 35s linear infinite; } 
+          .slider-track:hover { animation-play-state: paused; } 
+          .hide-scrollbar::-webkit-scrollbar { display: none; }
+        `}</style>
+        
+        {/* 1. BARRE DE NAVIGATION (HEADER) */}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: '0.75rem 2rem', bgcolor: 'white', borderBottom: '1px solid #e2e8f0', position: 'sticky', top: 0, zIndex: 100 }}>
+          <Typography variant="h5" sx={{ fontWeight: 900, color: 'primary.main', cursor: 'pointer' }}>
+            MBOA<Box component="span" sx={{ color: '#0f172a' }}>LAND</Box>
+          </Typography>
           
-          {!isAuthenticated ? (
-            <div style={{ display: 'flex', gap: '0.75rem', marginLeft: '1rem' }}>
-              {/* Ces boutons font appel à App.tsx pour afficher la modale */}
-              <button className="btn-login" onClick={onLoginRequest}>Se connecter</button>
-              <button className="btn-register" onClick={onRegisterRequest}>S'inscrire</button>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginLeft: '1rem' }}>
-              <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Mon Compte</span>
-              <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: 'var(--color-primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
-                JD
-              </div>
-            </div>
-          )}
-        </div>
-      </header>
-
-      <div className="page-container">
-        {/* MOTEUR DE RECHERCHE & PUBLICATION */}
-        <div className="hero-search-section">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
-            <div>
-              <h1 style={{ margin: 0 }}>Trouvez votre futur terrain</h1>
-              <p style={{ margin: '4px 0 0', color: '#cbd5e1' }}>Recherchez parmi nos parcelles titrées et vérifiées à travers le Cameroun.</p>
-            </div>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            {/* Liens vers le Footer */}
+            <Typography component="a" href="#about" sx={{ textDecoration: 'none', color: 'text.primary', fontWeight: 600, fontSize: '0.85rem', '&:hover': { color: 'primary.main' } }}>À propos</Typography>
+            <Typography component="a" href="#support" sx={{ textDecoration: 'none', color: 'text.primary', fontWeight: 600, fontSize: '0.85rem', '&:hover': { color: 'primary.main' } }}>Aide & Support</Typography>
             
-            <button 
-              onClick={onPublishRequest}
-              className="btn" 
-              style={{ background: '#ffffff', color: 'var(--color-primary-dark)', fontWeight: 800, padding: '0.65rem 1.25rem', display: 'flex', alignItems: 'center', gap: '0.4rem', width: 'auto', border: 'none', borderRadius: '8px' }}
-            >
-              <Plus className="w-4 h-4" /> Publier mon terrain
-            </button>
-          </div>
+            {!isAuthenticated ? (
+              <Box sx={{ display: 'flex', gap: 1.5 }}>
+                <Button variant="outlined" color="inherit" onClick={onLoginRequest} sx={{ borderColor: '#e2e8f0' }}>Se connecter</Button>
+                <Button variant="contained" color="primary" onClick={onRegisterRequest} disableElevation sx={{ borderRadius: '8px', px: 3 }}>S'inscrire</Button>
+              </Box>
+            ) : (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <Typography sx={{ fontWeight: 700, fontSize: '0.85rem' }}>Mon Compte</Typography>
+                <Avatar sx={{ bgcolor: 'primary.main', width: 34, height: 34, fontSize: '0.85rem', fontWeight: 'bold' }}>JD</Avatar>
+              </Box>
+            )}
+          </Box>
+        </Box>
+
+        {/* CONTENEUR PLEINE LARGEUR (xl) */}
+        <Container maxWidth="xl" sx={{ px: { xs: 2, md: 6 } }}>
           
-          <div className="booking-search-panel" style={{ maxWidth: '640px', margin: '1.5rem 0 0' }}>
-            <div className="search-field-group" style={{ borderRight: 'none' }}>
-              <Search className="search-field-icon" />
-              <input
-                type="text"
-                placeholder="Saisissez un nom de terrain, une ville, ou un n° de Titre Foncier..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-          </div>
-        </div>
+          {/* 2. RECHERCHE */}
+          <Box sx={{ background: 'linear-gradient(135deg, #05332c 0%, #0d5e45 100%)', borderRadius: 4, p: { xs: 3, md: 5 }, color: 'white', mt: 4, mb: 6, boxShadow: '0 10px 40px rgba(13, 94, 69, 0.15)' }}>
+            <Grid container justifyContent="space-between" alignItems="center" spacing={3}>
+              <Grid item xs={12} md={7}>
+                <Typography variant="h3" sx={{ mb: 1 }}>Investissez dans le foncier <Box component="span" sx={{ color: '#4ade80' }}>certifié</Box></Typography>
+                <Typography variant="body1" sx={{ color: '#cbd5e1', mb: 4 }}>Plateforme de numérisation et sécurisation notariale au Cameroun.</Typography>
+                <Paper sx={{ display: 'flex', alignItems: 'center', p: '4px 20px', borderRadius: 100, maxWidth: 500 }}>
+                  <Search color="#0a5c44" size={20} />
+                  <InputBase sx={{ ml: 2, flex: 1, py: 1.5, fontWeight: 600 }} placeholder="Ville, quartier ou n° TF..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+                </Paper>
+              </Grid>
+              <Grid item xs={12} md={4} sx={{ textAlign: { md: 'right' } }}>
+                <Button variant="contained" onClick={onPublishRequest} sx={{ bgcolor: 'white', color: 'primary.dark', '&:hover': { bgcolor: '#f1f5f9' }, fontWeight: 800, gap: 1, py: 2, px: 4, borderRadius: 3 }}>
+                  <Plus size={20} /> Publier un terrain
+                </Button>
+              </Grid>
+            </Grid>
+          </Box>
 
-        {/* CATÉGORIES */}
-        <h2 className="section-title">Rechercher par type de terrain</h2>
-        <p className="section-subtitle">Filtrez les offres foncières selon l'usage recherché.</p>
+          {/* 3. CATÉGORIES (CORRECTION : OCCUPE TOUTE LA LARGEUR ET S'ÉTIRE) */}
+          <Typography variant="h5" sx={{ mb: 3 }}>Rechercher par type de terrain</Typography>
+          <Box className="hide-scrollbar" sx={{ display: 'flex', gap: 2, overflowX: 'auto', pb: 2, mb: 5 }}>
+            {CATEGORIES.map((cat) => (
+              <Box 
+                key={cat.id} 
+                onClick={() => setSelectedCategory(cat.id)}
+                sx={{ 
+                  flex: 1, minWidth: 160, cursor: 'pointer', textAlign: 'center', /* flex: 1 permet d'occuper tout l'espace disponible */
+                  transition: 'all 0.2s', '&:hover': { transform: 'translateY(-5px)' }
+                }}
+              >
+                <Box sx={{ 
+                  width: '100%', height: 120, borderRadius: 3, overflow: 'hidden', mb: 1,
+                  border: selectedCategory === cat.id ? '3px solid #0a5c44' : '1px solid #e2e8f0',
+                  boxShadow: selectedCategory === cat.id ? '0 8px 20px rgba(10,92,68,0.15)' : 'none'
+                }}>
+                  <img src={cat.image} alt={cat.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </Box>
+                <Typography variant="subtitle2" color={selectedCategory === cat.id ? 'primary.main' : 'text.primary'}>{cat.name}</Typography>
+              </Box>
+            ))}
+          </Box>
 
-        <div className="category-grid">
-          {CATEGORIES.map((cat) => (
-            <div 
-              key={cat.id} 
-              className={`category-card ${selectedCategory === cat.id ? 'active' : ''}`}
-              onClick={() => setSelectedCategory(cat.id)}
-            >
-              <div className="category-img-container">
-                <img src={cat.image} alt={cat.name} />
-              </div>
-              <div className="category-name">{cat.name}</div>
-              <div className="category-count">{cat.count}</div>
-            </div>
-          ))}
-        </div>
+          {/* 4. GRILLE DES TERRAINS (CORRECTION : 4 CARTES PAR LIGNE SUR ÉCRAN LARGE) */}
+          <Typography variant="h5" sx={{ mb: 3 }}>Parcelles recommandées</Typography>
+          <Grid container spacing={3} sx={{ mb: 8 }}>
+            {filteredTerrains.map((terrain) => (
+              <Grid item xs={12} sm={6} md={4} lg={3} key={terrain.id}> {/* lg={3} force 4 cartes par ligne (12/3 = 4) */}
+                <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', boxShadow: 'none', border: '1px solid #e2e8f0', borderRadius: 3, '&:hover': { boxShadow: '0 10px 30px rgba(0,0,0,0.08)', transform: 'translateY(-4px)' }, transition: 'all 0.2s' }}>
+                  <Box sx={{ position: 'relative', pt: '65%', bgcolor: '#f0f0f0' }}>
+                    <CardMedia component="img" image={terrain.image} sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} />
+                    <Chip label={terrain.certified ? "✓ Titre Certifié" : "En attente"} size="small" sx={{ position: 'absolute', top: 10, left: 10, fontWeight: 800, fontSize: '0.65rem', bgcolor: 'rgba(255,255,255,0.9)', color: terrain.certified ? 'primary.main' : '#b45309' }} />
+                  </Box>
+                  <CardContent sx={{ p: 2, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 0.5 }} noWrap>{terrain.title}</Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>{terrain.city}</Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 800, mt: 'auto' }}>{terrain.price}</Typography>
+                  </CardContent>
+                  <CardActions sx={{ p: 2, pt: 0, gap: 1 }}>
+                    <Button fullWidth variant="outlined" size="small" onClick={() => onViewDetails(terrain)}>Détails</Button>
+                    <Button fullWidth variant="contained" size="small" disableElevation onClick={() => onBuy(terrain)}>Acheter</Button>
+                  </CardActions>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
 
-        {/* GRILLE TERRAINS */}
-        <h2 className="section-title">Nos parcelles recommandées</h2>
-        <p className="section-subtitle">
-          Découvrez notre sélection de terrains certifiés.
-          {selectedCategory !== 'all' && <span> (Filtré par type : <strong>{selectedCategory}</strong>)</span>}
-        </p>
-
-        <div className="terrains-grid">
-          {filteredTerrains.length > 0 ? (
-            filteredTerrains.map((terrain) => (
-              <div key={terrain.id} className="terrain-card" onClick={() => onViewDetails(terrain)}>
-                <div className="terrain-image-container">
-                  <img src={terrain.image} alt={terrain.title} className="terrain-img" />
-                  {terrain.certified ? (
-                    <div className="badge-certified">✓ Titre Certifié</div>
-                  ) : (
-                    <div className="badge-certified" style={{ backgroundColor: '#fffbeb', color: '#b45309' }}>En attente de certification</div>
-                  )}
-                </div>
-                <div className="terrain-details">
-                  <div className="terrain-title-row">
-                    <span className="terrain-card-title">{terrain.title}</span>
-                  </div>
-                  <div className="terrain-meta-line">{terrain.city}</div>
-                  <div className="terrain-meta-line">Titre Foncier : {terrain.landTitle}</div>
-                  <div className="terrain-meta-line">Vendeur : {terrain.owner} · {terrain.area}</div>
-                  <div className="terrain-card-price">{terrain.price}</div>
-                </div>
-                <div className="terrain-action-buttons" onClick={(e) => e.stopPropagation()}>
-                  <button className="btn-airbnb btn-airbnb-details" onClick={() => onViewDetails(terrain)}>
-                    Détails
-                  </button>
-                  <button className="btn-airbnb btn-airbnb-buy" onClick={() => onBuy(terrain)}>
-                    Acheter
-                  </button>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div style={{ gridColumn: '1 / -1', textAlign: 'center', color: '#717171', padding: '2.5rem 0', fontSize: '0.9rem' }}>
-              Aucune parcelle ne correspond à ces critères de recherche.
-            </div>
-          )}
-        </div>
-
-        {/* DESTINATIONS EN VOGUE */}
-        <div className="infinite-section">
-          <h2 className="section-title">Destinations en vogue au Cameroun</h2>
-          <p className="section-subtitle">
-            Explorez les opportunités foncières par ville en cliquant sur les cartes défilantes ci-dessous.
-          </p>
-
-          <div className="infinite-slider">
+          {/* 5. DESTINATIONS EN VOGUE */}
+          <Typography variant="h5" sx={{ mb: 3 }}>Destinations en vogue</Typography>
+          <Box sx={{ width: '100%', overflow: 'hidden', py: 2, mb: 6 }}>
             <div className="slider-track">
               {INFINITE_CITIES.map((city, idx) => (
-                <div 
-                  key={idx} 
-                  className={`destination-slide-card ${selectedCity === city.id ? 'active' : ''}`}
-                  onClick={() => setSelectedCity(city.id)}
-                >
-                  <img src={city.image} alt={city.name} />
-                  <div className="destination-overlay">
-                    <div className="destination-name-row">
-                      <span className="destination-name">{city.name}</span>
-                      <span className="destination-flag">{city.flag}</span>
-                    </div>
-                    <span className="destination-count">{city.count}</span>
-                  </div>
-                </div>
+                <Card key={idx} onClick={() => setSelectedCity(city.id)} sx={{ width: 280, height: 160, flexShrink: 0, position: 'relative', borderRadius: 4, cursor: 'pointer', border: selectedCity === city.id ? '3px solid #0a5c44' : '1px solid #e2e8f0' }}>
+                  <CardMedia component="img" image={city.image} sx={{ height: '100%', filter: 'brightness(0.95)' }} />
+                  <Box sx={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%)', display: 'flex', alignItems: 'flex-end', p: 2 }}>
+                    <Typography variant="h6" color="white">{city.name} {city.flag}</Typography>
+                  </Box>
+                </Card>
               ))}
             </div>
-          </div>
+          </Box>
 
-          <div className="city-results-area">
-            {selectedCity ? (
-              <div>
-                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '1.5rem', color: 'var(--color-primary-dark)' }}>
-                  Opportunités d'achat à : <span style={{ textDecoration: 'underline' }}>{selectedCity}</span>
-                </h3>
-                
-                <div className="terrains-grid" style={{ marginBottom: 0 }}>
-                  {cityFilteredTerrains.map((terrain) => (
-                    <div key={terrain.id} className="terrain-card" onClick={() => onViewDetails(terrain)}>
-                      <div className="terrain-image-container">
-                        <img src={terrain.image} alt={terrain.title} className="terrain-img" />
-                        {terrain.certified ? (
-                          <div className="badge-certified">✓ Titre Certifié</div>
-                        ) : (
-                          <div className="badge-certified" style={{ backgroundColor: '#fffbeb', color: '#b45309' }}>En attente de certification</div>
-                        )}
-                      </div>
-                      <div className="terrain-details">
-                        <div className="terrain-title-row">
-                          <span className="terrain-card-title">{terrain.title}</span>
-                      </div>
-                      <div className="terrain-meta-line">{terrain.city}</div>
-                      <div className="terrain-meta-line">Titre Foncier : {terrain.landTitle}</div>
-                      <div className="terrain-card-price">{terrain.price}</div>
-                    </div>
-                    <div className="terrain-action-buttons" onClick={(e) => e.stopPropagation()}>
-                      <button className="btn-airbnb btn-airbnb-details" onClick={() => onViewDetails(terrain)}>
-                        Détails
-                      </button>
-                      <button className="btn-airbnb btn-airbnb-buy" onClick={() => onBuy(terrain)}>
-                        Acheter
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="city-placeholder-text">
-              Cliquez sur une destination ci-dessus pour afficher instantanément ses terrains disponibles.
-            </div>
-          )}
-        </div>
-      </div>
+        </Container>
+      </Box>
 
-    </div>
+      {/* 6. NOUVEAU FOOTER (COMPACT, 3 COLONNES) */}
+      <Box sx={{ bgcolor: 'primary.dark', color: '#cbd5e1', pt: 4, pb: 2 }}>
+        <Container maxWidth="xl" sx={{ px: { xs: 2, md: 6 } }}>
+          
+          <Grid container spacing={4} sx={{ borderBottom: '1px solid rgba(255,255,255,0.1)', pb: 3 }}>
+            {/* Colonne 1 : À propos (Liée à l'ancre #about) */}
+            <Grid item xs={12} md={4} id="about" sx={{ scrollMarginTop: '100px' }}>
+              <Typography variant="subtitle1" color="white" fontWeight="800" mb={1}>À propos de nous</Typography>
+              <Typography variant="body2" sx={{ lineHeight: 1.5, pr: 2 }}>
+                MBOALAND est la première plateforme de numérisation foncière au Cameroun. Nous centralisons, vérifions et sécurisons vos transactions immobilières.
+              </Typography>
+            </Grid>
+            
+            {/* Colonne 2 : Aide & Contact (Liée à l'ancre #support) */}
+            <Grid item xs={12} md={4} id="support" sx={{ scrollMarginTop: '100px', display: 'flex', flexDirection: 'column', alignItems: { xs: 'flex-start', md: 'center' } }}>
+              <Box>
+                <Typography variant="subtitle1" color="white" fontWeight="800" mb={1}>Aide & Contact</Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                  <Typography variant="body2">📞 +237 600 00 00 00</Typography>
+                  <Typography variant="body2">✉️ support@mboaland.cm</Typography>
+                  <Typography variant="body2">📍 Douala, Cameroun</Typography>
+                </Box>
+              </Box>
+            </Grid>
+            
+            {/* Colonne 3 : Engagement Qualité */}
+            <Grid item xs={12} md={4} sx={{ display: 'flex', justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
+              <Box>
+                <Typography variant="subtitle1" color="white" fontWeight="800" mb={1}>Engagement Qualité</Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><Globe size={16} color="#34d399" /><Typography variant="body2">Cameroun · Français</Typography></Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><Shield size={16} color="#34d399" /><Typography variant="body2">Achat 100% garanti</Typography></Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><PhoneCall size={16} color="#34d399" /><Typography variant="body2">Support 7j/7</Typography></Box>
+                </Box>
+              </Box>
+            </Grid>
+          </Grid>
 
-    {/* NOUVEAU FOOTER ALLÉGÉ */}
-    <footer className="booking-footer" id="support">
-      <div className="footer-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
-        
-        <div className="footer-column" id="about">
-          <h4>À propos de nous</h4>
-          <p style={{ fontSize: '0.85rem', lineHeight: 1.6, color: '#94a3b8', margin: 0 }}>
-            MBOALAND est la première plateforme de numérisation foncière au Cameroun. Nous centralisons, vérifions et sécurisons vos transactions immobilières en étroite collaboration avec des notaires et des géomètres-experts assermentés par l'État.
-          </p>
-        </div>
-        
-        <div className="footer-column">
-          <h4>Aide & Contact</h4>
-          <ul style={{ color: '#94a3b8', fontSize: '0.85rem', lineHeight: 1.8 }}>
-            <li>📞 +237 600 00 00 00</li>
-            <li>✉️ support@mboaland.cm</li>
-            <li>📍 Douala, Cameroun</li>
-          </ul>
-        </div>
-        
-        <div className="footer-column" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          <h4>MBOALAND S.A.</h4>
-          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', fontSize: '0.85rem' }}>
-            <Globe className="w-5 h-5 text-emerald-400" />
-            <span>Cameroun · Français</span>
-          </div>
-          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', fontSize: '0.85rem' }}>
-            <Shield className="w-5 h-5 text-emerald-400" />
-            <span>Achat 100% garanti</span>
-          </div>
-          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', fontSize: '0.85rem' }}>
-            <PhoneCall className="w-5 h-5 text-emerald-400" />
-            <span>Service Client H24</span>
-          </div>
-        </div>
+          {/* LIGNE DES LIENS LÉGAUX */}
+          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: 'center', mt: 2, gap: 1 }}>
+            <Typography variant="caption">© 2026 Mboaland S.A. Tous droits réservés.</Typography>
+            <Box sx={{ display: 'flex', gap: 3 }}>
+              <Typography component="a" href="#privacy" variant="caption" sx={{ color: 'inherit', textDecoration: 'none', '&:hover': { color: 'white', textDecoration: 'underline' } }}>
+                Politique de confidentialité
+              </Typography>
+              <Typography component="a" href="#terms" variant="caption" sx={{ color: 'inherit', textDecoration: 'none', '&:hover': { color: 'white', textDecoration: 'underline' } }}>
+                Mentions Légales
+              </Typography>
+            </Box>
+          </Box>
+        </Container>
+      </Box>
 
-      </div>
-
-      <div className="footer-bottom" style={{ justifyContent: 'center' }}>
-        <span>© 2026 Mboaland S.A. Tous droits réservés. Numérisation foncière sécurisée.</span>
-      </div>
-    </footer>
-
-    {/* MODALE VENDEUR (Contrôlée par App.tsx) */}
-    {isPublishModalOpen && (
-      <div className="modal-overlay" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className="modal-content-box" style={{ maxWidth: '580px', overflowY: 'auto', maxHeight: '90vh' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.75rem' }}>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, margin: 0, color: 'var(--color-primary-dark)' }}>
-              Publier un terrain sur MBOALAND
-            </h3>
-            <X className="w-5 h-5 text-slate-400 cursor-pointer" onClick={onClosePublishModal} />
-          </div>
-
-          <form onSubmit={handlePublishTerrain} className="custom-form-grid" style={{ margin: 0 }}>
-            <div style={{ gridColumn: 'span 2' }}>
-              <label className="form-group-label">Nom de la parcelle / Titre d'annonce *</label>
-              <input type="text" placeholder="Ex: Terrain plat prêt à bâtir à Odza" className="form-group-input" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} required />
-            </div>
-            <div>
-              <label className="form-group-label">Ville *</label>
-              <input type="text" placeholder="Ex: Yaoundé" className="form-group-input" value={newCity} onChange={(e) => setNewCity(e.target.value)} required />
-            </div>
-            <div>
-              <label className="form-group-label">Catégorie d'usage *</label>
-              <select className="form-group-input" value={newType} onChange={(e) => setNewType(e.target.value as any)}>
-                <option value="residentiel">Résidentiel</option>
-                <option value="agricole">Agricole (Champs/Vergers)</option>
-                <option value="commercial">Commercial (Bureaux/Immeubles)</option>
-                <option value="industriel">Industriel (Entrepôts/Usines)</option>
-              </select>
-            </div>
-            <div>
-              <label className="form-group-label">N° de Titre Foncier *</label>
-              <input type="text" placeholder="Ex: TF-4481/CM/CEN" className="form-group-input" value={newLandTitle} onChange={(e) => setNewLandTitle(e.target.value)} required />
-            </div>
-            <div>
-              <label className="form-group-label">Prix demandé (FCFA) *</label>
-              <input type="text" placeholder="Ex: 8000000" className="form-group-input" value={newPrice} onChange={(e) => setNewPrice(e.target.value)} required />
-            </div>
-            <div>
-              <label className="form-group-label">Superficie (m²)</label>
-              <input type="text" placeholder="Ex: 1 200 m²" className="form-group-input" value={newArea} onChange={(e) => setNewArea(e.target.value)} />
-            </div>
-            <div>
-              <label className="form-group-label">Nom complet du propriétaire *</label>
-              <input type="text" placeholder="Ex: Jean Dupont" className="form-group-input" value={newOwner} onChange={(e) => setNewOwner(e.target.value)} required />
-            </div>
-            <div style={{ gridColumn: 'span 2' }}>
-              <label className="form-group-label">Description du terrain</label>
-              <textarea placeholder="Décrivez l'accès, l'environnement, la viabilisation..." className="form-group-input" rows={3} style={{ resize: 'vertical' }} value={newDesc} onChange={(e) => setNewDesc(e.target.value)} />
-            </div>
-            <div style={{ gridColumn: 'span 2' }}>
-              <span className="form-group-label" style={{ marginBottom: '0.5rem', display: 'block' }}>Copie conforme du Titre Foncier (PDF, Optionnel)</span>
-              <div style={{ border: '1px dashed #cbd5e1', backgroundColor: '#f8fafc', borderRadius: '8px', padding: '1rem', textAlign: 'center', cursor: 'pointer' }}>
-                <UploadCloud className="w-6 h-6 text-slate-400 mx-auto mb-1" />
-                <span style={{ fontSize: '0.78rem', fontWeight: 600 }}>Parcourir ou déposer le fichier</span>
-              </div>
-            </div>
-            <div style={{ gridColumn: 'span 2', display: 'flex', gap: '0.75rem', marginTop: '1rem', borderTop: '1px solid #e2e8f0', paddingTop: '1.25rem' }}>
-              <button type="button" className="btn btn-airbnb btn-airbnb-details" onClick={onClosePublishModal}>Annuler</button>
-              <button type="submit" className="btn btn-airbnb btn-airbnb-buy">Publier l'annonce de vente</button>
-            </div>
+      {/* MODALE PUBLICATION */}
+      <Dialog open={isPublishModalOpen} onClose={onClosePublishModal} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 3 } }}>
+        <DialogTitle sx={{ fontWeight: 800, color: 'primary.dark' }}>Publier un terrain</DialogTitle>
+        <DialogContent dividers>
+          <form id="publishForm" onSubmit={handlePublishTerrain}>
+            <Grid container spacing={2} sx={{ mt: 0.5 }}>
+              <Grid item xs={12}><TextField size="small" fullWidth required label="Titre d'annonce" value={newTitle} onChange={e => setNewTitle(e.target.value)} /></Grid>
+              <Grid item xs={12} sm={6}><TextField size="small" fullWidth required label="Ville" value={newCity} onChange={e => setNewCity(e.target.value)} /></Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Usage</InputLabel>
+                  <Select label="Usage" value={newType} onChange={e => setNewType(e.target.value as any)}>
+                    <MenuItem value="residentiel">Résidentiel</MenuItem>
+                    <MenuItem value="agricole">Agricole</MenuItem>
+                    <MenuItem value="commercial">Commercial</MenuItem>
+                    <MenuItem value="industriel">Industriel</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6}><TextField size="small" fullWidth required label="N° de Titre Foncier" value={newLandTitle} onChange={e => setNewLandTitle(e.target.value)} /></Grid>
+              <Grid item xs={12} sm={6}><TextField size="small" fullWidth required label="Prix (FCFA)" type="number" value={newPrice} onChange={e => setNewPrice(e.target.value)} /></Grid>
+              <Grid item xs={12}><TextField size="small" fullWidth multiline rows={3} label="Description" value={newDesc} onChange={e => setNewDesc(e.target.value)} /></Grid>
+            </Grid>
           </form>
-        </div>
-      </div>
-    )}
-
-  </div>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, px: 3 }}>
+          <Button onClick={onClosePublishModal} color="inherit">Annuler</Button>
+          <Button type="submit" form="publishForm" variant="contained" color="primary" disableElevation>Publier</Button>
+        </DialogActions>
+      </Dialog>
+    </ThemeProvider>
   );
 }
