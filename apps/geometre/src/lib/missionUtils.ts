@@ -27,7 +27,7 @@ export function canEditTechnical(status: MissionStatus): boolean {
 
 export function validateTechnicalData(data: MissionTechnicalData): string[] {
   const errors: string[] = [];
-  // ✅ Utilise les bons noms de champs définis dans MissionTechnicalData
+  //  Utilise les bons noms de champs définis dans MissionTechnicalData
   if (!data.nb_bornes || data.nb_bornes <= 0)
     errors.push("Le nombre de bornes doit être supérieur à 0.");
   if (!data.surface_calculee?.trim())
@@ -48,7 +48,7 @@ export interface MissionStep {
 
 export function getMissionSteps(mission: Mission): MissionStep[] {
   const { status, technical } = mission;
-  // ✅ Accès aux bons champs de MissionTechnicalData
+  //  Accès aux bons champs de MissionTechnicalData
   const hasGps        = Boolean(technical?.fichier_gps);
   const hasTechnical  =
     (technical?.nb_bornes ?? 0) > 0 &&

@@ -16,7 +16,6 @@ import SaveIcon from "@mui/icons-material/Save";
 import CloseIcon from "@mui/icons-material/Close";
 import LockIcon from "@mui/icons-material/Lock";
 import ShieldIcon from "@mui/icons-material/Shield";
-import StarIcon from "@mui/icons-material/Star";
 
 const PROFIL_INITIAL = {
   nom: "Jean-Paul Mbarga",
@@ -145,21 +144,6 @@ export default function Profil() {
               <Box>
                 <Typography sx={{ fontWeight: 700, fontSize: 18 }}>{profil.nom}</Typography>
                 <Typography variant="body2" color="text.secondary">{profil.titre}</Typography>
-                {/* Étoiles */}
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mt: 0.5 }}>
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <StarIcon
-                      key={i}
-                      sx={{
-                        fontSize: 16,
-                        color: i <= Math.floor(profil.note) ? "#f59e0b" : "#e5e7eb",
-                      }}
-                    />
-                  ))}
-                  <Typography variant="caption" sx={{ ml: 0.5, color: "#555" }}>
-                    {profil.note} ({profil.avis} avis)
-                  </Typography>
-                </Box>
               </Box>
             </Box>
 
@@ -199,7 +183,6 @@ export default function Profil() {
               {[
                 { label: "Missions réalisées", value: "27",    color: "#10b981" },
                 { label: "Terrains certifiés", value: "63",    color: "#3b82f6" },
-                { label: "Note moyenne",        value: "4.8/5", color: "#f59e0b" },
                 { label: "Années d'expérience", value: "7",    color: "#8b5cf6" },
               ].map((s) => (
                 <Box

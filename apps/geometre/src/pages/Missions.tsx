@@ -15,7 +15,7 @@ import { STATUS_CHIP_COLOR, STATUS_LABELS } from "../lib/missionUtils";
 import type { MissionStatus } from "../types";
 
 export default function Missions() {
-  // ✅ remplace useNavigate (react-router) par useGeometreNavigation
+  //  remplace useNavigate (react-router) par useGeometreNavigation
   const { goTo } = useGeometreNavigation();
 
   const { missions, resetDemo } = useMissions();
@@ -56,7 +56,7 @@ export default function Missions() {
     }
   };
 
-  // ✅ chemin relatif "missions/3" — goTo ajoute le préfixe /surveyor si besoin
+  //  chemin relatif "missions/3" — goTo ajoute le préfixe /surveyor si besoin
   const handleOpenMission = (id: number) => {
     goTo(`missions/${id}`);
   };
