@@ -82,7 +82,7 @@ function ReadOnlyBanner() {
 /* ───────── Component ───────── */
 
 export default function MissionsDetails() {
-  // ✅ remplace useNavigate par useGeometreNavigation
+  //  remplace useNavigate par useGeometreNavigation
   const { goTo } = useGeometreNavigation();
   const { id } = useParams();
 
@@ -114,7 +114,7 @@ export default function MissionsDetails() {
     return (
       <Box sx={{ p: 4 }}>
         <Alert severity="error">Mission introuvable</Alert>
-        {/* ✅ "missions" relatif au lieu de "/missions" */}
+        {/*  "missions" relatif au lieu de "/missions" */}
         <Button sx={{ mt: 2 }} startIcon={<ArrowBackIcon />} onClick={() => goTo("missions")}>
           Retour
         </Button>
